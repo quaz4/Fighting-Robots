@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'application'
+}
+
+repositories {
+    jcenter()
+}
+
+javafx {
+    version = "13"
+    modules = [ 'javafx.controls' ]
+}
+
+application {
+    mainClassName = "art.willstew.arena.javafx.ExampleJFXApp"
+}
