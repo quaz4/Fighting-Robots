@@ -6,16 +6,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class ExampleJFXApp extends Application 
-{
-    public static void main(String[] args) 
-    {
-        launch();        
+public class ExampleJFXApp extends Application {
+    public static void main(String[] args) {
+        launch();  
     }
     
     @Override
-    public void start(Stage stage) 
-    {
+    public void start(Stage stage) {
         stage.setTitle("Robot AI Test (JavaFX)");
         JFXArena arena = new JFXArena();
         
@@ -24,8 +21,7 @@ public class ExampleJFXApp extends Application
         Button btn2 = new Button("My Button 2");
         toolbar.getItems().addAll(btn1, btn2);
         
-        btn1.setOnAction((event) ->
-        {
+        btn1.setOnAction((event) -> {
             System.out.println("Button 1 pressed");
         });
                     
