@@ -9,10 +9,14 @@ repositories {
 }
 
 javafx {
-    version = "13"
     modules = [ 'javafx.controls' ]
 }
 
 application {
     mainClassName = "art.willstew.arena.javafx.ExampleJFXApp"
 }
+
+// There is an issue with GTK 3 on my local machine, I need to run using GTK 2 in order to resolve it
+// GTK 3 doesn't rended the window decoration and I can't click on parts of the app
+// TODO: Make this option configurable
+applicationDefaultJvmArgs = ["-Djdk.gtk.verbose=true", "-Djdk.gtk.version=2"]
