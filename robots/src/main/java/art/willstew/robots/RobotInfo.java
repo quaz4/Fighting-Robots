@@ -5,6 +5,11 @@ import java.lang.Float;
 public class RobotInfo {
 
     /**
+     * Monitor is used as a lock to make the class thread safe
+     */
+    Object monitor = new Object();
+
+    /**
      * Each robots name must be a unique non empty string
      */
     private String name;
@@ -38,12 +43,21 @@ public class RobotInfo {
     }
 
     private void setName(String name) {
-         // Name must be a non empty string
+        // Name must be a non empty string
         if (name.length() == 0) {
             throw new IllegalArgumentException("Name must be a non empty string");
         }
 
-        this.name = name;
+        synchronized(this.monitor) {
+            this.name = name;
+        }
+    }
+
+    public String getName() {
+        synchronized(this.monitor) {
+            return this.name;
+        }
+        
     }
 
     private void setX(int x) {
@@ -51,7 +65,15 @@ public class RobotInfo {
             throw new IllegalArgumentException("X must be an int greater than or equal to 0");
         }
 
-        this.x = x;
+        synchronized(this.monitor) {
+            this.x = x;
+        }
+    }
+
+    public int getX() {
+        synchronized(this.monitor) {
+            return this.x;
+        }
     }
 
     private void setY(int y) {
@@ -59,7 +81,15 @@ public class RobotInfo {
             throw new IllegalArgumentException("Y must be an int greater than or equal to 0");
         }
 
-        this.y = y;
+        synchronized(this.monitor) {
+            this.y = y;
+        }
+    }
+
+    public int getY() {
+        synchronized(this.monitor) {
+            return this.y;
+        }
     }
 
     private void setHealth(float health) {
@@ -68,7 +98,15 @@ public class RobotInfo {
             throw new IllegalArgumentException("Health must be an int greater than or equal to 0");
         }
 
-        this.health = health;
+        synchronized(this.monitor) {
+            this.health = health;
+        }
+    }
+
+    public float getHealth() {
+        synchronized(this.monitor) {
+            return this.health;
+        }
     }
     
 }
