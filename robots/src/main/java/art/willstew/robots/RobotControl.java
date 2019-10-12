@@ -13,26 +13,26 @@ public class RobotControl {
 
     public boolean moveNorth() {
         // TODO
-        return true;
+        return false;
     }
 
     public boolean moveEast() {
         // TODO
-        return true;
+        return false;
     }
 
     public boolean moveSouth() {
         // TODO
-        return true;
+        return false;
     }
 
     public boolean moveWest() {
         // TODO
-        return true;
+        return false;
     }
 
     public boolean fire(int x, int y) {
         // TODO
-        return true;
+        return false;
     }
 }
