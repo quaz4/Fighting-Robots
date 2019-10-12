@@ -11,7 +11,6 @@ public class ExampleJFXApp extends Application {
     public static void main(String[] args) {
         
         Game game = new Game(null, null);
-        game.toString();
 
         launch();
     }

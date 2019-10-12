@@ -10,8 +10,7 @@ import javafx.scene.text.TextAlignment;
 /**
  * A JavaFX GUI element that displays a grid on which you can draw images, text and lines.
  */
-public class JFXArena extends Pane
-{
+public class JFXArena extends Pane {
     // Represents the image to draw. You can modify this to introduce multiple images.
     private static final String IMAGE_FILE = "1554047213.png";
     private Image robot1;
@@ -30,8 +29,7 @@ public class JFXArena extends Pane
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
-    public JFXArena()
-    {
+    public JFXArena() {
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
         robot1 = new Image(getClass().getClassLoader().getResourceAsStream(IMAGE_FILE));
@@ -51,8 +49,7 @@ public class JFXArena extends Pane
      * You will probably need to significantly modify this method. Currently it just serves as a
      * demonstration.
      */
-    public void setRobotPosition(double x, double y)
-    {
+    public void setRobotPosition(double x, double y) {
         robotX = x;
         robotY = y;
         requestLayout();
@@ -67,8 +64,7 @@ public class JFXArena extends Pane
      * the other 'draw...()' methods. You shouldn't need to modify anything else about it.
      */
     @Override
-    public void layoutChildren()
-    {
+    public void layoutChildren() {
         super.layoutChildren(); 
         GraphicsContext gfx = canvas.getGraphicsContext2D();
         gfx.clearRect(0.0, 0.0, canvas.getWidth(), canvas.getHeight());
@@ -88,14 +84,12 @@ public class JFXArena extends Pane
         gfx.setStroke(Color.DARKGREY);
         gfx.strokeRect(0.0, 0.0, arenaPixelWidth - 1.0, arenaPixelHeight - 1.0); // Outer edge
 
-        for(int gridX = 1; gridX < gridWidth; gridX++) // Internal vertical grid lines
-        {
+        for(int gridX = 1; gridX < gridWidth; gridX++) { // Internal vertical grid lines
             double x = (double) gridX * gridSquareSize;
             gfx.strokeLine(x, 0.0, x, arenaPixelHeight);
         }
         
-        for(int gridY = 1; gridY < gridHeight; gridY++) // Internal horizontal grid lines
-        {
+        for(int gridY = 1; gridY < gridHeight; gridY++) { // Internal horizontal grid lines
             double y = (double) gridY * gridSquareSize;
             gfx.strokeLine(0.0, y, arenaPixelWidth, y);
         }
@@ -116,8 +110,7 @@ public class JFXArena extends Pane
      *     
      * You shouldn't need to modify this method.
      */
-    private void drawImage(GraphicsContext gfx, Image image, double gridX, double gridY)
-    {
+    private void drawImage(GraphicsContext gfx, Image image, double gridX, double gridY) {
         // Get the pixel coordinates representing the centre of where the image is to be drawn. 
         double x = (gridX + 0.5) * gridSquareSize;
         double y = (gridY + 0.5) * gridSquareSize;
@@ -129,16 +122,13 @@ public class JFXArena extends Pane
         double fullSizePixelHeight = robot1.getHeight();
         
         double displayedPixelWidth, displayedPixelHeight;
-        if(fullSizePixelWidth > fullSizePixelHeight)
-        {
+        if(fullSizePixelWidth > fullSizePixelHeight) {
             // Here, the image is wider than it is high, so we'll display it such that it's as 
             // wide as a full grid cell, and the height will be set to preserve the aspect 
             // ratio.
             displayedPixelWidth = gridSquareSize;
             displayedPixelHeight = gridSquareSize * fullSizePixelHeight / fullSizePixelWidth;
-        }
-        else
-        {
+        } else {
             // Otherwise, it's the other way around -- full height, and width is set to 
             // preserve the aspect ratio.
             displayedPixelHeight = gridSquareSize;
@@ -160,8 +150,7 @@ public class JFXArena extends Pane
      *
      * You shouldn't need to modify this method.
      */
-    private void drawLabel(GraphicsContext gfx, String label, double gridX, double gridY)
-    {
+    private void drawLabel(GraphicsContext gfx, String label, double gridX, double gridY) {
         gfx.setTextAlign(TextAlignment.CENTER);
         gfx.setTextBaseline(VPos.TOP);
         gfx.setStroke(Color.BLUE);
@@ -174,8 +163,7 @@ public class JFXArena extends Pane
      * You shouldn't need to modify this method.
      */
     private void drawLine(GraphicsContext gfx, double gridX1, double gridY1, 
-                                               double gridX2, double gridY2)
-    {
+                                               double gridX2, double gridY2) {
         gfx.setStroke(Color.RED);
         
         // Recalculate the starting coordinate to be one unit closer to the destination, so that it
