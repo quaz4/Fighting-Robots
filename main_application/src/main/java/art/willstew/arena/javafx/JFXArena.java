@@ -104,7 +104,7 @@ public class JFXArena extends Pane
         // ** You will need to adapt this to the requirements of your application. **
         drawImage(gfx, robot1, robotX, robotY);
         drawLabel(gfx, "Robot Name (100%)", robotX, robotY);
-        drawLine(gfx, robotX, robotY, robotX + 1.0, robotY - 2.0);
+        drawLine(gfx, robotX, robotY, robotX + 5.0, robotY + 2.0);
     }
     
     

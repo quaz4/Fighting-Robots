@@ -1,5 +1,6 @@
 package art.willstew.arena.javafx;
 
+import art.willstew.logic.Game;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -8,21 +9,29 @@ import javafx.stage.Stage;
 
 public class ExampleJFXApp extends Application {
     public static void main(String[] args) {
-        launch();  
+        
+        Game game = new Game(null, null);
+        game.toString();
+
+        launch();
     }
     
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Robot AI Test (JavaFX)");
+        stage.setTitle("Fighting Robots");
         JFXArena arena = new JFXArena();
         
         ToolBar toolbar = new ToolBar();
-        Button btn1 = new Button("My Button 1");
-        Button btn2 = new Button("My Button 2");
+        Button btn1 = new Button("Start");
+        Button btn2 = new Button("Stop");
         toolbar.getItems().addAll(btn1, btn2);
         
         btn1.setOnAction((event) -> {
-            System.out.println("Button 1 pressed");
+            System.out.println("Start");
+        });
+
+        btn2.setOnAction((event) -> {
+            System.out.println("Stop");
         });
                     
         TextArea logger = new TextArea();

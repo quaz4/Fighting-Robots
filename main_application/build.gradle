@@ -4,6 +4,10 @@ plugins {
     id 'application'
 }
 
+dependencies {
+    compile project(':robots')
+}
+
 repositories {
     jcenter()
 }
@@ -17,6 +21,6 @@ application {
 }
 
 // There is an issue with GTK 3 on my local machine, I need to run using GTK 2 in order to resolve it
-// GTK 3 doesn't rended the window decoration and I can't click on parts of the app
+// GTK 3 doesn't render the window decorations and I can't click on parts of the app
 // TODO: Make this option configurable
 applicationDefaultJvmArgs = ["-Djdk.gtk.verbose=true", "-Djdk.gtk.version=2"]

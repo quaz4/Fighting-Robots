@@ -7,6 +7,6 @@
  * in the user manual at https://docs.gradle.org/5.6.2/userguide/multi_project_builds.html
  */
 
-include "main_application", "robots", "ai_one", "ai_two"
+include "robots", "main_application", "ai_one", "ai_two"
 
 rootProject.name = "Fighting-Robots"
