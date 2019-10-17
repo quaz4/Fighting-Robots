@@ -33,7 +33,7 @@ public class AIOne implements RobotAI  {
         try {
             String direction = "north";
 
-            // While the thread hasm't been stopped
+            // While the thread hasn't been stopped
             while(!Thread.interrupted()) {
                 RobotInfo me = this.rc.getRobot();
     
@@ -41,14 +41,15 @@ public class AIOne implements RobotAI  {
                 for (RobotInfo robot : this.rc.getAllRobots()) {
     
                     // Skip the robot controlled by this ai
-                    if(!robot.getName().equals(me.getName())
-                        && (Math.abs(me.getX() - robot.getX()) <= 2)
-                        && (Math.abs(me.getY() - robot.getY()) <= 2)
+                    // Skip any robot that is out of range
+                    if(!robot.name.equals(me.name)
+                        && (Math.abs(me.x - robot.x) <= 2)
+                        && (Math.abs(me.y - robot.y) <= 2)
                         ) {
                         
                         // Wait for 0.5s
                         Thread.sleep(500);
-                        this.rc.fire(robot.getX(), robot.getY());
+                        this.rc.fire(robot.x, robot.x);
                     }
                 }
 
