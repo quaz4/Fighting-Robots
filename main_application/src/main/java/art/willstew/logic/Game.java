@@ -18,14 +18,14 @@ public class Game {
         this.config = config;
     }
 
-    public boolean fire(RobotInfo robot, int x, int y) {
+    // public boolean fire(RobotInfo robot, int x, int y) {
 
-    }
+    // }
 
-    public boolean move(RobotInfo robot, int x, int y) {
-        // Ensure robot stays within the board
-        // if () {
+    // public boolean move(RobotInfo robot, int x, int y) {
+    //     // Ensure robot stays within the board
+    //     // if () {
 
-        // }
-    }
+    //     // }
+    // }
 }

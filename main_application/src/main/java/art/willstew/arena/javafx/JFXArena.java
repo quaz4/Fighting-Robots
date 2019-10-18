@@ -1,7 +1,15 @@
+// This class should have no logic in it
+
 package art.willstew.arena.javafx;
 
-import javafx.scene.canvas.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import art.willstew.robots.RobotInfo;
 import javafx.geometry.VPos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -19,17 +27,21 @@ public class JFXArena extends Pane {
     // requirements of your application.
     private int gridWidth = 12;
     private int gridHeight = 8;
-    private double robotX = 1;
-    private double robotY = 3;
+    private int robotX = 1;
+    private int robotY = 3;
 
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
 
-    
+    private RobotInfo[] robots;
+
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
-    public JFXArena() {
+    public JFXArena(RobotInfo[] robots) {
+
+        this.robots = robots;
+
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
         robot1 = new Image(getClass().getClassLoader().getResourceAsStream(IMAGE_FILE));
@@ -40,6 +52,18 @@ public class JFXArena extends Pane {
         canvas.widthProperty().bind(widthProperty());
         canvas.heightProperty().bind(heightProperty());
         getChildren().add(canvas);
+
+        Runnable runnable = new Runnable() {
+            public void run() {
+                int one = (int)(Math.random() * gridWidth) + 0;
+                int two = (int)(Math.random() * gridHeight) + 0;
+                setRobotPosition(null, one, two);
+            }
+        };
+    
+        ScheduledExecutorService service = Executors
+                        .newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
     }
     
     
@@ -49,12 +73,20 @@ public class JFXArena extends Pane {
      * You will probably need to significantly modify this method. Currently it just serves as a
      * demonstration.
      */
-    public void setRobotPosition(double x, double y) {
+    public void setRobotPosition(RobotInfo robot, int x, int y) {
         robotX = x;
         robotY = y;
+
+        System.out.println(x + ":" + y);
+
         requestLayout();
     }
         
+    // public void setRobotPosition(String name, double x, double y) {
+    //     robotX = x;
+    //     robotY = y;
+    //     requestLayout();
+    // }
         
     /**
      * This method is called in order to redraw the screen, either because the user is manipulating 
@@ -98,7 +130,11 @@ public class JFXArena extends Pane {
         // ** You will need to adapt this to the requirements of your application. **
         drawImage(gfx, robot1, robotX, robotY);
         drawLabel(gfx, "Robot Name (100%)", robotX, robotY);
-        drawLine(gfx, robotX, robotY, robotX + 5.0, robotY + 2.0);
+
+        int one = (int)(Math.random() * gridWidth) + 0;
+        int two = (int)(Math.random() * gridHeight) + 0;
+
+        drawLine(gfx, robotX, robotY, one, two);
     }
     
     

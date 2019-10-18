@@ -18,7 +18,7 @@ public class ExampleJFXApp extends Application {
 
         // TODO Initialise robots and pass to arena
 
-        JFXArena arena = new JFXArena();
+        JFXArena arena = new JFXArena(null);
         
         ToolBar toolbar = new ToolBar();
         Button btn1 = new Button("Start");

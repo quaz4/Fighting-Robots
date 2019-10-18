@@ -34,7 +34,7 @@ public class RobotControlImp {
 
     public boolean moveNorth() {
         // Needs checks
-        this.me.x++;
+        // this.me.x++;
         return false;
     }
 
