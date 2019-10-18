@@ -17,4 +17,15 @@ public class Game {
         this.arena = arena;
         this.config = config;
     }
+
+    public boolean fire(RobotInfo robot, int x, int y) {
+
+    }
+
+    public boolean move(RobotInfo robot, int x, int y) {
+        // Ensure robot stays within the board
+        // if () {
+
+        // }
+    }
 }

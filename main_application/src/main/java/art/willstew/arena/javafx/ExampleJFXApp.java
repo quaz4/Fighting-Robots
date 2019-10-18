@@ -9,15 +9,15 @@ import javafx.stage.Stage;
 
 public class ExampleJFXApp extends Application {
     public static void main(String[] args) {
-        
-        Game game = new Game(null, null);
-
         launch();
     }
     
     @Override
     public void start(Stage stage) {
         stage.setTitle("Fighting Robots");
+
+        // TODO Initialise robots and pass to arena
+
         JFXArena arena = new JFXArena();
         
         ToolBar toolbar = new ToolBar();
