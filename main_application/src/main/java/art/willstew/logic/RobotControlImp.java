@@ -6,18 +6,17 @@ import art.willstew.robots.RobotInfo;
 
 public class RobotControlImp {
 
-    private ArrayList<RobotInfo> robots; // TODO Maybe make thread safe? and unmodifiable?
+    private ArrayList<RobotInfoImp> robots; // TODO Maybe make thread safe? and unmodifiable?
     private String name; // The unique name of the robot this controller controls
-    private RobotInfo me; // A reference to the robot this controller controls
-    private Game game; // Reference to the game object that controls the game state TODO Rethink this...
+    private RobotInfoImp me; // A reference to the robot this controller controls
 
-    public RobotControlImp(ArrayList<RobotInfo> robots, String name, Game game) {
+    public RobotControlImp(ArrayList<RobotInfoImp> robots, String name) {
         this.robots = robots;
         this.name = name;
 
-        // Find this robot and keep a reference it somewhere easy to access
-        for (RobotInfo robot : this.robots) {
-            if(this.me.name.equals(robot.name)) {
+        // Find this robot and keep a reference to it somewhere easy to access
+        for (RobotInfoImp robot : this.robots) {
+            if(this.me.getName().equals(robot.getName())) {
                 this.me = robot;
                 break;
             }
@@ -33,9 +32,12 @@ public class RobotControlImp {
     }
 
     public boolean moveNorth() {
-        // Needs checks
-        // this.me.x++;
         return false;
+    }
+
+    // Working on it
+    public void registerMoveNorth() {
+        
     }
 
     public boolean moveEast() {
