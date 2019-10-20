@@ -6,6 +6,8 @@ plugins {
 
 dependencies {
     compile project(':robots')
+    compile project(':ai_one')
+    compile project(':ai_two')
 }
 
 repositories {

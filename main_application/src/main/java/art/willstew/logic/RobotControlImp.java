@@ -4,7 +4,7 @@ import art.willstew.robots.*;
 import art.willstew.logic.*;
 import art.willstew.arena.javafx.JFXArena;
 
-public class RobotControlImp {
+public class RobotControlImp implements RobotControl {
 
     private JFXArena arena;
     private RobotInfoImp robot; // A reference to the robot this controller controls
@@ -19,13 +19,11 @@ public class RobotControlImp {
     }
 
     public RobotInfo[] getAllRobots() {
-        
-        return null;
+        return this.arena.getAllRobots();
     }
 
-    // TODO Is this sus?
     public boolean moveNorth() {
-        return this.arena.move((RobotInfoImp)this.getRobot(), 0, 1);
+        return this.arena.move((RobotInfoImp)this.getRobot(), 0, -1);
     }
 
     public boolean moveEast() {
@@ -33,7 +31,7 @@ public class RobotControlImp {
     }
 
     public boolean moveSouth() {
-        return this.arena.move((RobotInfoImp)this.getRobot(), 0, -1);
+        return this.arena.move((RobotInfoImp)this.getRobot(), 0, 1);
     }
 
     public boolean moveWest() {

@@ -1,6 +1,8 @@
 package art.willstew.ai;
 
-import art.willstew.robots.*;
+import art.willstew.robots.RobotAI;
+import art.willstew.robots.RobotControl;
+import art.willstew.robots.RobotInfo;
 
 public class AIOne implements RobotAI  {
 
@@ -42,39 +44,41 @@ public class AIOne implements RobotAI  {
     
                     // Skip the robot controlled by this ai
                     // Skip any robot that is out of range
-                    if(!robot.name.equals(me.name)
-                        && (Math.abs(me.x - robot.x) <= 2)
-                        && (Math.abs(me.y - robot.y) <= 2)
+                    if(!robot.getName().equals(me.getName())
+                        && (Math.abs(me.getX() - robot.getX()) <= 2)
+                        && (Math.abs(me.getY() - robot.getY()) <= 2)
                         ) {
                         
                         // Wait for 0.5s
                         Thread.sleep(500);
-                        this.rc.fire(robot.x, robot.x);
+                        this.rc.fire(robot.getX(), robot.getX());
                     }
                 }
 
-                /**
-                 * Try and move, if it fails, try the next direction
-                 */
+                // Try and move, if it fails, try the next direction
                 switch (direction) {
                     case "north":
                         if(!this.rc.moveNorth()) {
                             direction = "east";
+                        } else {
                             break;
                         }
                     case "east":
                         if(!this.rc.moveEast()) {
                             direction = "south";
+                        } else {
                             break;
                         }
                     case "south":
                         if(!this.rc.moveSouth()) {
                             direction = "west";
+                        } else {
                             break;
                         }
                     case "west":
                         if(!this.rc.moveWest()) {
                             direction = "north";
+                        } else {
                             break;
                         }
                 }
@@ -86,8 +90,8 @@ public class AIOne implements RobotAI  {
             if(Thread.interrupted()) {
                 throw new InterruptedException();
             }
-        } catch(InterruptedException e) { // TODO Check if I need to remove this
-
+        } catch(InterruptedException e) {
+            // Thread has been interrupted, stopping
         }
     }
 

@@ -1,10 +1,12 @@
 package art.willstew.arena.javafx;
 
-import art.willstew.logic.Game;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.ToolBar;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class ExampleJFXApp extends Application {
@@ -26,11 +28,13 @@ public class ExampleJFXApp extends Application {
         toolbar.getItems().addAll(btn1, btn2);
         
         btn1.setOnAction((event) -> {
-            System.out.println("Start");
+            System.out.println("Starting...");
+            arena.start();
         });
 
         btn2.setOnAction((event) -> {
-            System.out.println("Stop");
+            System.out.println("Stopping...");
+            arena.stop();
         });
                     
         TextArea logger = new TextArea();

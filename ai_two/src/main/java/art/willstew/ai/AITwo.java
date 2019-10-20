@@ -26,4 +26,6 @@ public class AITwo implements RobotAI  {
     private void logic() {
         // TODO AI One logic
     }
+
+    public void stop() {}
 }

@@ -1,15 +1,13 @@
-// This class should have no logic in it
-
 package art.willstew.arena.javafx;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import java.util.*;
+import java.util.concurrent.*;
 
-// import art.willstew.robots.RobotInfo;
+import art.willstew.ai.*;
 import art.willstew.logic.*;
+import art.willstew.robots.*;
+
+import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -26,11 +24,9 @@ public class JFXArena extends Pane {
     private static final String IMAGE_FILE = "1554047213.png";
     private Image robot1;
 
-    // Store a reference to each robot controller
-    private RobotControlImp[] robotControllers;
-    private ArrayList<RobotInfoImp> robotInfo;
-
     private MovementManager movementManager;
+    private ArrayList<RobotAI> ais;
+    private ArrayList<RobotInfoImp> robotInfo;
 
     // TODO shot array to keep track of what shots to render
     
@@ -38,29 +34,21 @@ public class JFXArena extends Pane {
     // requirements of your application.
     private int gridWidth = 12;
     private int gridHeight = 8;
-    // private int robotX = 1;
-    // private int robotY = 3;
-
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
 
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
-    public JFXArena(RobotControlImp[] rcs) {
+    public JFXArena(RobotAI ais) {
 
         // TODO Update where x/y come from
         this.movementManager = new MovementManager(12, 8);
 
-        RobotInfoImp testRobot = new RobotInfoImp("Test Robot", 2, 2, 100.0f);
-
+        this.ais = new ArrayList<RobotAI>();
+        this.ais.add(new AIOne());
 
         this.robotInfo = new ArrayList<RobotInfoImp>();
-        this.robotInfo.add(testRobot);
-
-        this.movementManager.add(testRobot);
-
-        this.robotControllers = rcs;
 
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
@@ -72,49 +60,56 @@ public class JFXArena extends Pane {
         canvas.widthProperty().bind(widthProperty());
         canvas.heightProperty().bind(heightProperty());
         getChildren().add(canvas);
-
-        // Runnable runnable = new Runnable() {
-        //     public void run() {
-        //         int one = (int)(Math.random() * gridWidth) + 0;
-        //         int two = (int)(Math.random() * gridHeight) + 0;
-        //         setRobotPosition(null, one, two);
-        //     }
-        // };
-    
-        // ScheduledExecutorService service = Executors
-        //                 .newSingleThreadScheduledExecutor();
-        // service.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
     }
 
-    // TODO Do I need to make this a future that runs on the GUI thread?
-    public boolean move(RobotInfoImp robot, int deltaX, int deltaY) {
-        boolean moved = this.movementManager.move(robot, deltaX, deltaY);
-        
-        if (moved) {
-            this.requestLayout();
+    public void start() {
+        for (RobotAI ai : this.ais) {
+            RobotInfoImp testRobot = new RobotInfoImp("Test Robot", 2, 2, 100.0f);
+            this.robotInfo.add(testRobot);
+            this.movementManager.add(testRobot);
+            ai.runAI(new RobotControlImp(this, testRobot));
         }
-
-        return moved;
     }
+
+    public void stop() {
+        for (RobotAI ai : this.ais) {
+            ai.stop();
+        }
+    }
+
+    public RobotInfo[] getAllRobots() {
+		return this.robotInfo.toArray(new RobotInfo[this.robotInfo.size()]);
+	}
 
     /**
-     * Moves a robot image to a new grid position. 
-     *
-     * You will probably need to significantly modify this method. Currently it just serves as a
-     * demonstration.
+     * Runs calls to check and move the specific robot in the GUI thread
+     * Uses a comletable future to block until the GUI thread runs the code
      */
-    public void setRobotPosition(RobotInfoImp robot, int x, int y) {
-        // Platform.runLater(() -> {
-        //     robot.setX(x);
-        //     robot.setY(y);
-        // });
+    public boolean move(RobotInfoImp robot, int deltaX, int deltaY) {
+        CompletableFuture<Boolean> movedFuture = new CompletableFuture<Boolean>();
 
-        // robotX = x;
-        // robotY = y;
+        Platform.runLater(() -> {
+            boolean moved = this.movementManager.move(robot, deltaX, deltaY);
+            
+            if (moved) {
+                this.requestLayout();
+            }
 
-        System.out.println(x + ":" + y);
+            System.out.println(Thread.currentThread().getName());
 
-        requestLayout();
+            movedFuture.complete(Boolean.valueOf(moved));
+        });
+
+        boolean rval = false;
+
+        try {
+            rval = movedFuture.get().booleanValue();
+        } catch (CancellationException | ExecutionException | InterruptedException e) {
+            // Return false as doing nothing is always safe
+            return false;
+        }
+        
+        return rval;
     }
         
     /**
@@ -161,14 +156,9 @@ public class JFXArena extends Pane {
         // drawLabel(gfx, "Robot Name (100%)", robotX, robotY);
 
         for(RobotInfoImp robot : this.robotInfo) {
-            System.out.println("START");
             drawImage(gfx, robot1, robot.getX(), robot.getY());
-            drawLabel(gfx, "Robot Name (100%)", robot.getX(), robot.getY());
-            System.out.println("STOP");
+            drawLabel(gfx, robot.getName() + " (100%)", robot.getX(), robot.getY());
         }
-
-        // int one = (int)(Math.random() * gridWidth) + 0;
-        // int two = (int)(Math.random() * gridHeight) + 0;
 
         // drawLine(gfx, robotX, robotY, one, two);
     }

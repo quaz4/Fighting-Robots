@@ -1,8 +1,5 @@
 package art.willstew.logic;
 
-import art.willstew.robots.*;
-import art.willstew.logic.*;
-
 import java.util.*;
 
 /** 
@@ -38,7 +35,8 @@ public class MovementManager {
         int newY = robot.getY() + deltaY;
 
         // Invalid move if outside the grid
-        if (newX > this.x || newX < 0 || newY > this.y || newY < 0) {
+        // TODO Revisit when working on Config object
+        if (newX >= this.x || newX < 0 || newY >= this.y || newY < 0) {
             return false;
         }
 
