@@ -11,7 +11,7 @@ import art.willstew.robots.RobotAI;
 /**
  * Container class for holding all the parts of an individual robot
  */
-@Deprecated
+ // TODO Maybe remove this
 public class Robot {
 
     private RobotControl rc;

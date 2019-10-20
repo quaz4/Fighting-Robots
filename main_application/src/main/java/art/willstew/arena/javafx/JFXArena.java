@@ -6,7 +6,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import art.willstew.robots.RobotInfo;
+import java.util.*;
+
+// import art.willstew.robots.RobotInfo;
+import art.willstew.logic.*;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -22,25 +25,42 @@ public class JFXArena extends Pane {
     // Represents the image to draw. You can modify this to introduce multiple images.
     private static final String IMAGE_FILE = "1554047213.png";
     private Image robot1;
+
+    // Store a reference to each robot controller
+    private RobotControlImp[] robotControllers;
+    private ArrayList<RobotInfoImp> robotInfo;
+
+    private MovementManager movementManager;
+
+    // TODO shot array to keep track of what shots to render
     
     // The following values are arbitrary, and you may need to modify them according to the 
     // requirements of your application.
     private int gridWidth = 12;
     private int gridHeight = 8;
-    private int robotX = 1;
-    private int robotY = 3;
+    // private int robotX = 1;
+    // private int robotY = 3;
 
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
 
-    private RobotInfo[] robots;
-
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
-    public JFXArena(RobotInfo[] robots) {
+    public JFXArena(RobotControlImp[] rcs) {
 
-        this.robots = robots;
+        // TODO Update where x/y come from
+        this.movementManager = new MovementManager(12, 8);
+
+        RobotInfoImp testRobot = new RobotInfoImp("Test Robot", 2, 2, 100.0f);
+
+
+        this.robotInfo = new ArrayList<RobotInfoImp>();
+        this.robotInfo.add(testRobot);
+
+        this.movementManager.add(testRobot);
+
+        this.robotControllers = rcs;
 
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
@@ -53,40 +73,49 @@ public class JFXArena extends Pane {
         canvas.heightProperty().bind(heightProperty());
         getChildren().add(canvas);
 
-        Runnable runnable = new Runnable() {
-            public void run() {
-                int one = (int)(Math.random() * gridWidth) + 0;
-                int two = (int)(Math.random() * gridHeight) + 0;
-                setRobotPosition(null, one, two);
-            }
-        };
+        // Runnable runnable = new Runnable() {
+        //     public void run() {
+        //         int one = (int)(Math.random() * gridWidth) + 0;
+        //         int two = (int)(Math.random() * gridHeight) + 0;
+        //         setRobotPosition(null, one, two);
+        //     }
+        // };
     
-        ScheduledExecutorService service = Executors
-                        .newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
+        // ScheduledExecutorService service = Executors
+        //                 .newSingleThreadScheduledExecutor();
+        // service.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
     }
-    
-    
+
+    // TODO Do I need to make this a future that runs on the GUI thread?
+    public boolean move(RobotInfoImp robot, int deltaX, int deltaY) {
+        boolean moved = this.movementManager.move(robot, deltaX, deltaY);
+        
+        if (moved) {
+            this.requestLayout();
+        }
+
+        return moved;
+    }
+
     /**
      * Moves a robot image to a new grid position. 
      *
      * You will probably need to significantly modify this method. Currently it just serves as a
      * demonstration.
      */
-    public void setRobotPosition(RobotInfo robot, int x, int y) {
-        robotX = x;
-        robotY = y;
+    public void setRobotPosition(RobotInfoImp robot, int x, int y) {
+        // Platform.runLater(() -> {
+        //     robot.setX(x);
+        //     robot.setY(y);
+        // });
+
+        // robotX = x;
+        // robotY = y;
 
         System.out.println(x + ":" + y);
 
         requestLayout();
     }
-        
-    // public void setRobotPosition(String name, double x, double y) {
-    //     robotX = x;
-    //     robotY = y;
-    //     requestLayout();
-    // }
         
     /**
      * This method is called in order to redraw the screen, either because the user is manipulating 
@@ -128,13 +157,20 @@ public class JFXArena extends Pane {
 
         // Invoke helper methods to draw things at the current location.
         // ** You will need to adapt this to the requirements of your application. **
-        drawImage(gfx, robot1, robotX, robotY);
-        drawLabel(gfx, "Robot Name (100%)", robotX, robotY);
+        // drawImage(gfx, robot1, robotX, robotY);
+        // drawLabel(gfx, "Robot Name (100%)", robotX, robotY);
 
-        int one = (int)(Math.random() * gridWidth) + 0;
-        int two = (int)(Math.random() * gridHeight) + 0;
+        for(RobotInfoImp robot : this.robotInfo) {
+            System.out.println("START");
+            drawImage(gfx, robot1, robot.getX(), robot.getY());
+            drawLabel(gfx, "Robot Name (100%)", robot.getX(), robot.getY());
+            System.out.println("STOP");
+        }
 
-        drawLine(gfx, robotX, robotY, one, two);
+        // int one = (int)(Math.random() * gridWidth) + 0;
+        // int two = (int)(Math.random() * gridHeight) + 0;
+
+        // drawLine(gfx, robotX, robotY, one, two);
     }
     
     

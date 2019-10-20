@@ -7,6 +7,8 @@ import art.willstew.robots.*;
 /**
  * Game class controls the game logic
  */
+
+ // TODO Maybe remove this
 public class Game {
     
     private JFXArena arena;

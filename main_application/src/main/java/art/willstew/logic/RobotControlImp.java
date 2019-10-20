@@ -1,58 +1,43 @@
 package art.willstew.logic;
 
-import java.util.ArrayList;
-
-import art.willstew.robots.RobotInfo;
+import art.willstew.robots.*;
+import art.willstew.logic.*;
+import art.willstew.arena.javafx.JFXArena;
 
 public class RobotControlImp {
 
-    private ArrayList<RobotInfoImp> robots; // TODO Maybe make thread safe? and unmodifiable?
-    private String name; // The unique name of the robot this controller controls
-    private RobotInfoImp me; // A reference to the robot this controller controls
+    private JFXArena arena;
+    private RobotInfoImp robot; // A reference to the robot this controller controls
 
-    public RobotControlImp(ArrayList<RobotInfoImp> robots, String name) {
-        this.robots = robots;
-        this.name = name;
-
-        // Find this robot and keep a reference to it somewhere easy to access
-        for (RobotInfoImp robot : this.robots) {
-            if(this.me.getName().equals(robot.getName())) {
-                this.me = robot;
-                break;
-            }
-        }
+    public RobotControlImp(JFXArena arena, RobotInfoImp robot) {
+        this.arena = arena;
+        this.robot = robot;
     }
 
     public RobotInfo getRobot() {
-        return this.me;
+        return this.robot;
     }
 
     public RobotInfo[] getAllRobots() {
-        return this.robots.toArray(new RobotInfo[this.robots.size()]);
-    }
-
-    public boolean moveNorth() {
-        return false;
-    }
-
-    // Working on it
-    public void registerMoveNorth() {
         
+        return null;
+    }
+
+    // TODO Is this sus?
+    public boolean moveNorth() {
+        return this.arena.move((RobotInfoImp)this.getRobot(), 0, 1);
     }
 
     public boolean moveEast() {
-        // TODO
-        return false;
+        return this.arena.move((RobotInfoImp)this.getRobot(), 1, 0);
     }
 
     public boolean moveSouth() {
-        // TODO
-        return false;
+        return this.arena.move((RobotInfoImp)this.getRobot(), 0, -1);
     }
 
     public boolean moveWest() {
-        // TODO
-        return false;
+        return this.arena.move((RobotInfoImp)this.getRobot(), -1, 0);
     }
 
     public boolean fire(int x, int y) {

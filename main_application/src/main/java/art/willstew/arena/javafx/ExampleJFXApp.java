@@ -49,4 +49,8 @@ public class ExampleJFXApp extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+    public void log(String message) {
+        
+    }
 }
