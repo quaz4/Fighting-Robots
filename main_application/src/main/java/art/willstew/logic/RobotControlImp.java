@@ -1,7 +1,6 @@
 package art.willstew.logic;
 
 import art.willstew.robots.*;
-import art.willstew.logic.*;
 import art.willstew.arena.javafx.JFXArena;
 
 public class RobotControlImp implements RobotControl {
