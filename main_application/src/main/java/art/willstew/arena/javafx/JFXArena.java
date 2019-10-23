@@ -1,12 +1,16 @@
 package art.willstew.arena.javafx;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-import art.willstew.ai.*;
-import art.willstew.logic.*;
-import art.willstew.robots.*;
-
+import art.willstew.ai.AIOne;
+import art.willstew.logic.MovementManager;
+import art.willstew.logic.RobotControlImp;
+import art.willstew.logic.RobotInfoImp;
+import art.willstew.robots.RobotAI;
+import art.willstew.robots.RobotInfo;
 import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
@@ -27,6 +31,7 @@ public class JFXArena extends Pane {
     private MovementManager movementManager;
     private ArrayList<RobotAI> ais;
     private ArrayList<RobotInfoImp> robotInfo;
+    private ArrayList<RobotControlImp> robotControls;
 
     // TODO shot array to keep track of what shots to render
     
@@ -46,9 +51,22 @@ public class JFXArena extends Pane {
         this.movementManager = new MovementManager(12, 8);
 
         this.ais = new ArrayList<RobotAI>();
-        this.ais.add(new AIOne());
-
         this.robotInfo = new ArrayList<RobotInfoImp>();
+        this.robotControls = new ArrayList<RobotControlImp>();
+
+        // ROBOT 1
+        this.ais.add(new AIOne());
+        RobotInfoImp testRobot1 = new RobotInfoImp("Robot 1", 2, 2, 100.0f);
+        this.robotInfo.add(testRobot1);
+        this.movementManager.add(testRobot1);
+        this.robotControls.add(new RobotControlImp(this, testRobot1));
+
+        // ROBOT 2
+        this.ais.add(new AIOne());
+        RobotInfoImp testRobot2 = new RobotInfoImp("Robot 2", 7, 7, 100.0f);
+        this.robotInfo.add(testRobot2);
+        this.movementManager.add(testRobot2);
+        this.robotControls.add(new RobotControlImp(this, testRobot2));
 
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
@@ -63,11 +81,8 @@ public class JFXArena extends Pane {
     }
 
     public void start() {
-        for (RobotAI ai : this.ais) {
-            RobotInfoImp testRobot = new RobotInfoImp("Test Robot", 2, 2, 100.0f);
-            this.robotInfo.add(testRobot);
-            this.movementManager.add(testRobot);
-            ai.runAI(new RobotControlImp(this, testRobot));
+        for (int i = 0; i < this.ais.size(); i++) {
+            this.ais.get(i).runAI(this.robotControls.get(i));
         }
     }
 
@@ -240,4 +255,9 @@ public class JFXArena extends Pane {
                        (gridX2 + 0.5) * gridSquareSize, 
                        (gridY2 + 0.5) * gridSquareSize);
     }
+
+	public boolean fire(int x, int y, int x2, int y2) {
+        System.out.println("Brrrrrrrrrrt");
+		return true;
+	}
 }

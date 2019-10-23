@@ -38,7 +38,6 @@ public class RobotControlImp implements RobotControl {
     }
 
     public boolean fire(int x, int y) {
-        // TODO
-        return false;
+        return this.arena.fire(this.robot.getX(), this.robot.getY(), x, y);
     }
 }
