@@ -85,6 +85,8 @@ public class JFXArena extends Pane {
         canvas.widthProperty().bind(widthProperty());
         canvas.heightProperty().bind(heightProperty());
         getChildren().add(canvas);
+
+        this.requestLayout();
     }
 
     public void start() {
