@@ -30,4 +30,8 @@ public class LaserBeam {
     public int getEndY() {
         return this.endY;
     }
+
+    public String toString() {
+        return this.startX + ":" + this.startY + " -> " + this.endX + ":" + this.endY;
+    }
 }

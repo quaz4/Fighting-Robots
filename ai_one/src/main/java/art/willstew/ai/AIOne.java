@@ -39,6 +39,8 @@ public class AIOne implements RobotAI  {
             while(!Thread.interrupted()) {
                 RobotInfo me = this.rc.getRobot();
     
+                boolean fired = false;
+
                 // Itterate over all the other robots in the game
                 for (RobotInfo robot : this.rc.getAllRobots()) {
     
@@ -49,10 +51,16 @@ public class AIOne implements RobotAI  {
                         && (Math.abs(me.getY() - robot.getY()) <= 2)
                         ) {
                         
-                        // Wait for 0.5s
+                        // Wait for 0.5s before shooting
                         Thread.sleep(500);
-                        this.rc.fire(robot.getX(), robot.getX());
+                        this.rc.fire(robot.getX(), robot.getY());
+                        fired = true;
+                        break;
                     }
+                }
+
+                if (fired) {
+                    continue;
                 }
 
                 // Try and move, if it fails, try the next direction

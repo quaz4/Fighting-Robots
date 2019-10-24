@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import art.willstew.ai.AIOne;
+import art.willstew.logic.LaserBeam;
 import art.willstew.logic.MovementManager;
 import art.willstew.logic.RobotControlImp;
 import art.willstew.logic.RobotInfoImp;
@@ -34,6 +38,7 @@ public class JFXArena extends Pane {
     private ArrayList<RobotControlImp> robotControls;
 
     // TODO shot array to keep track of what shots to render
+    private ArrayList<LaserBeam> lasers;
     
     // The following values are arbitrary, and you may need to modify them according to the 
     // requirements of your application.
@@ -53,6 +58,8 @@ public class JFXArena extends Pane {
         this.ais = new ArrayList<RobotAI>();
         this.robotInfo = new ArrayList<RobotInfoImp>();
         this.robotControls = new ArrayList<RobotControlImp>();
+
+        this.lasers = new ArrayList<LaserBeam>();
 
         // ROBOT 1
         this.ais.add(new AIOne());
@@ -176,6 +183,11 @@ public class JFXArena extends Pane {
         }
 
         // drawLine(gfx, robotX, robotY, one, two);
+        // Draw lines here
+        for(LaserBeam laser : this.lasers) {
+            System.out.println(laser);
+            drawLine(gfx, laser.getStartX(), laser.getStartY(), laser.getEndX(), laser.getEndY());
+        }
     }
     
     
@@ -258,6 +270,28 @@ public class JFXArena extends Pane {
 
 	public boolean fire(int x, int y, int x2, int y2) {
         System.out.println("Brrrrrrrrrrt");
+
+        LaserBeam laser = new LaserBeam(x, y, x2, y2);
+
+        this.lasers.add(laser);
+        this.requestLayout();
+
+        // TODO Change location and size of pool
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+        Runnable task = () -> {
+            Platform.runLater(() -> {
+                this.lasers.remove(laser);
+                this.requestLayout();
+            });
+        };
+
+        executor.schedule(task, 250, TimeUnit.MILLISECONDS);
+
+        // and finally, when your program wants to exit
+        executor.shutdown();
+
+
 		return true;
 	}
 }
