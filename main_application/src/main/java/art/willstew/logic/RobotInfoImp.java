@@ -108,5 +108,10 @@ public class RobotInfoImp implements RobotInfo {
             return this.health;
         }
     }
-    
+
+    public String toString() {
+        synchronized(this.monitor) {
+            return this.name + " (" + (this.health / 100 * 100) + "%)";
+        }
+    }
 }

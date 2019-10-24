@@ -19,6 +19,7 @@ import javafx.application.Platform;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -50,7 +51,7 @@ public class JFXArena extends Pane {
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
-    public JFXArena(RobotAI ais) {
+    public JFXArena(TextArea logger) {
 
         // TODO Update where x/y come from
         this.movementManager = new MovementManager(12, 8);
@@ -107,7 +108,7 @@ public class JFXArena extends Pane {
 
     /**
      * Runs calls to check and move the specific robot in the GUI thread
-     * Uses a comletable future to block until the GUI thread runs the code
+     * Uses a completable future to block until the GUI thread runs the code
      */
     public boolean move(RobotInfoImp robot, int deltaX, int deltaY) {
         CompletableFuture<Boolean> movedFuture = new CompletableFuture<Boolean>();
@@ -181,7 +182,7 @@ public class JFXArena extends Pane {
 
         for(RobotInfoImp robot : this.robotInfo) {
             drawImage(gfx, robot1, robot.getX(), robot.getY());
-            drawLabel(gfx, robot.getName() + " (100%)", robot.getX(), robot.getY());
+            drawLabel(gfx, robot.toString(), robot.getX(), robot.getY());
         }
 
         // drawLine(gfx, robotX, robotY, one, two);
@@ -271,8 +272,6 @@ public class JFXArena extends Pane {
     }
 
 	public boolean fire(int x, int y, int x2, int y2) {
-        System.out.println("Brrrrrrrrrrt");
-
         LaserBeam laser = new LaserBeam(x, y, x2, y2);
 
         this.lasers.add(laser);
@@ -293,7 +292,7 @@ public class JFXArena extends Pane {
         // and finally, when your program wants to exit
         executor.shutdown();
 
-
+        // TODO Check if action is legal before firing, return if fired
 		return true;
 	}
 }

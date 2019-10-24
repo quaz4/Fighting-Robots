@@ -25,6 +25,10 @@ public class ExampleJFXApp extends Application {
 
         // TODO Initialise robots and pass to arena
 
+        TextArea logger = new TextArea();
+        logger.appendText("Welcome to\n");
+        logger.appendText("ROBOT WARS\n");
+
         JFXArena arena = new JFXArena(null);
         
         ToolBar toolbar = new ToolBar();
@@ -41,10 +45,6 @@ public class ExampleJFXApp extends Application {
             System.out.println("Stopping...");
             arena.stop();
         });
-                    
-        TextArea logger = new TextArea();
-        logger.appendText("Hello\n");
-        logger.appendText("World\n");
         
         SplitPane splitPane = new SplitPane();
         splitPane.getItems().addAll(arena, logger);
