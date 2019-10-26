@@ -94,14 +94,23 @@ public class RobotInfoImp implements RobotInfo {
 
     public void setHealth(float health) {
         // Compare will return 0 if health is less than 0.0f
-        if (Float.compare(health, 0.0f) == 0) {
-            throw new IllegalArgumentException("Health must be an int greater than or equal to 0");
+        if (Float.compare(health, 0.0f) <= 0) {
+            // throw new IllegalArgumentException("Health must be an int greater than or equal to 0");
+            health = 0.0f;
         }
 
         synchronized(this.monitor) {
             this.health = health;
         }
+
+        // System.out.println(this.name + "'s health is now " + this.health);
     }
+
+    // public void takeHit() {
+    //     synchronized(this.monitor) {
+    //         this.health -= 35.0f;
+    //     }
+    // }
 
     public float getHealth() {
         synchronized(this.monitor) {
@@ -111,7 +120,7 @@ public class RobotInfoImp implements RobotInfo {
 
     public String toString() {
         synchronized(this.monitor) {
-            return this.name + " (" + (this.health / 100 * 100) + "%)";
+            return this.name + " (" + Math.round(this.health / 100 * 100) + "%)";
         }
     }
 }

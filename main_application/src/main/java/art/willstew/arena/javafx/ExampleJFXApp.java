@@ -26,10 +26,8 @@ public class ExampleJFXApp extends Application {
         // TODO Initialise robots and pass to arena
 
         TextArea logger = new TextArea();
-        logger.appendText("Welcome to\n");
-        logger.appendText("ROBOT WARS\n");
 
-        JFXArena arena = new JFXArena(null);
+        JFXArena arena = new JFXArena(logger);
         
         ToolBar toolbar = new ToolBar();
         Button btn1 = new Button("Start");
@@ -38,6 +36,7 @@ public class ExampleJFXApp extends Application {
         
         btn1.setOnAction((event) -> {
             System.out.println("Starting...");
+            logger.appendText("Game start\n");
             arena.start();
         });
 

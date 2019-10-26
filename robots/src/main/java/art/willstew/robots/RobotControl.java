@@ -1,6 +1,7 @@
 package art.willstew.robots;
 
 public interface RobotControl {
+ 
     public RobotInfo getRobot();
 
     public RobotInfo[] getAllRobots();
@@ -14,4 +15,8 @@ public interface RobotControl {
     public boolean moveWest();
 
     public boolean fire(int x, int y);
+
+    public RobotInfo hitMade();
+
+    public RobotInfo hitTaken();
 }

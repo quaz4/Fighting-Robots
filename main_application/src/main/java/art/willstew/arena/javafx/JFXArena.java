@@ -1,6 +1,8 @@
 package art.willstew.arena.javafx;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -11,9 +13,12 @@ import java.util.concurrent.TimeUnit;
 import art.willstew.ai.AIOne;
 import art.willstew.logic.LaserBeam;
 import art.willstew.logic.MovementManager;
+import art.willstew.logic.NotificationManager;
 import art.willstew.logic.RobotControlImp;
 import art.willstew.logic.RobotInfoImp;
+import art.willstew.logic.Util;
 import art.willstew.robots.RobotAI;
+import art.willstew.robots.RobotControl;
 import art.willstew.robots.RobotInfo;
 import javafx.application.Platform;
 import javafx.geometry.VPos;
@@ -34,9 +39,12 @@ public class JFXArena extends Pane {
     private Image robot1;
 
     private MovementManager movementManager;
-    private ArrayList<RobotAI> ais;
-    private ArrayList<RobotInfoImp> robotInfo;
-    private ArrayList<RobotControlImp> robotControls;
+    private NotificationManager nm;
+    // private ArrayList<RobotAI> ais;
+    private Hashtable<String, RobotAI> ais;
+    private ArrayList<RobotInfo> robotInfo;
+    // private ArrayList<RobotControl> robotControls;
+    private Hashtable<String, RobotControl> robotControls;
 
     // TODO shot array to keep track of what shots to render
     private ArrayList<LaserBeam> lasers;
@@ -48,33 +56,42 @@ public class JFXArena extends Pane {
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
 
+    private TextArea logger;
+
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
     public JFXArena(TextArea logger) {
 
+        this.logger = logger;
+
         // TODO Update where x/y come from
         this.movementManager = new MovementManager(12, 8);
+        this.nm = new NotificationManager();
 
-        this.ais = new ArrayList<RobotAI>();
-        this.robotInfo = new ArrayList<RobotInfoImp>();
-        this.robotControls = new ArrayList<RobotControlImp>();
+        this.ais = new Hashtable<String, RobotAI>();
+        this.robotInfo = new ArrayList<RobotInfo>();
+        this.robotControls = new Hashtable<String, RobotControl>();
 
         this.lasers = new ArrayList<LaserBeam>();
 
-        // ROBOT 1
-        this.ais.add(new AIOne());
-        RobotInfoImp testRobot1 = new RobotInfoImp("Robot 1", 2, 2, 100.0f);
-        this.robotInfo.add(testRobot1);
-        this.movementManager.add(testRobot1);
-        this.robotControls.add(new RobotControlImp(this, testRobot1));
+        RobotInfoImp robotOne = new RobotInfoImp("Izzy", 2, 2, 100.0f);
+        this.addRobot(robotOne, new AIOne());
 
-        // ROBOT 2
-        this.ais.add(new AIOne());
-        RobotInfoImp testRobot2 = new RobotInfoImp("Robot 2", 7, 7, 100.0f);
-        this.robotInfo.add(testRobot2);
-        this.movementManager.add(testRobot2);
-        this.robotControls.add(new RobotControlImp(this, testRobot2));
+        RobotInfoImp robotTwo = new RobotInfoImp("Archie", 6, 7, 100.0f);
+        this.addRobot(robotTwo, new AIOne());
+
+        RobotInfoImp robotThree = new RobotInfoImp("Juno", 1, 7, 100.0f);
+        this.addRobot(robotThree, new AIOne()); 
+
+        RobotInfoImp robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
+        this.addRobot(robotFour, new AIOne());
+
+        RobotInfoImp robotFive = new RobotInfoImp("Remus", 2, 4, 100.0f);
+        this.addRobot(robotFive, new AIOne());
+
+        RobotInfoImp robotSix = new RobotInfoImp("Bonnie", 2, 1, 100.0f);
+        this.addRobot(robotSix, new AIOne()); 
 
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
@@ -90,21 +107,63 @@ public class JFXArena extends Pane {
         this.requestLayout();
     }
 
+    public void addRobot(RobotInfo robot, RobotAI ai) {
+        this.ais.put(robot.getName(), ai);
+        this.robotInfo.add(robot);
+        this.movementManager.add(robot);
+        this.robotControls.put(robot.getName(), new RobotControlImp(this, robot, this.nm));
+    }
+
     public void start() {
-        for (int i = 0; i < this.ais.size(); i++) {
-            this.ais.get(i).runAI(this.robotControls.get(i));
+        for (Map.Entry<String,RobotAI> set : this.ais.entrySet()) {
+            set.getValue().runAI(this.robotControls.get(set.getKey()));
         }
     }
 
     public void stop() {
-        for (RobotAI ai : this.ais) {
-            ai.stop();
+        for (RobotAI ai : this.ais.values()) {
+            try {
+                ai.stop();
+            } catch (IllegalStateException e) {
+                //TODO: handle exception
+            }
+            
         }
     }
 
     public RobotInfo[] getAllRobots() {
 		return this.robotInfo.toArray(new RobotInfo[this.robotInfo.size()]);
-	}
+    }
+    
+    public void killRobot(String name) {
+        // Remove robot from robotInfo list
+        for (RobotInfo robot : this.robotInfo.toArray(new RobotInfo[this.robotInfo.size()])) {
+            if (robot.getName().equals(name)) {
+                this.ais.get(robot.getName()).stop();
+                logger.appendText(robot.getName() + " is now dead\n");
+                // this.robotInfo.remove(robot);
+                
+                this.checkEndGame();
+                break;
+            }
+        }
+    }
+
+    public void checkEndGame() {
+        int alive = 0;
+        RobotInfo lastRobot = null;
+        for (RobotInfo robot : this.robotInfo.toArray(new RobotInfo[this.robotInfo.size()])) {
+            if(Util.compare(robot.getHealth(), 0.01f) == 1) {
+                alive++;
+                lastRobot = robot;
+            }
+        }
+
+        if(alive == 1) {
+           this.stop();
+           this.logger.appendText(lastRobot.getName() + " is the winner\n"); 
+        }
+    }
 
     /**
      * Runs calls to check and move the specific robot in the GUI thread
@@ -120,7 +179,7 @@ public class JFXArena extends Pane {
                 this.requestLayout();
             }
 
-            System.out.println(Thread.currentThread().getName());
+            // System.out.println(Thread.currentThread().getName());
 
             movedFuture.complete(Boolean.valueOf(moved));
         });
@@ -140,9 +199,6 @@ public class JFXArena extends Pane {
     /**
      * This method is called in order to redraw the screen, either because the user is manipulating 
      * the window, OR because you've called 'requestLayout()'.
-     *
-     * You will need to modify the last part of this method; specifically the sequence of calls to
-     * the other 'draw...()' methods. You shouldn't need to modify anything else about it.
      */
     @Override
     public void layoutChildren() {
@@ -177,18 +233,17 @@ public class JFXArena extends Pane {
 
         // Invoke helper methods to draw things at the current location.
         // ** You will need to adapt this to the requirements of your application. **
-        // drawImage(gfx, robot1, robotX, robotY);
-        // drawLabel(gfx, "Robot Name (100%)", robotX, robotY);
 
-        for(RobotInfoImp robot : this.robotInfo) {
+        for(RobotInfo robot : this.robotInfo) {
             drawImage(gfx, robot1, robot.getX(), robot.getY());
             drawLabel(gfx, robot.toString(), robot.getX(), robot.getY());
         }
 
         // drawLine(gfx, robotX, robotY, one, two);
         // Draw lines here
+        // TODO This needs to be synchronised, as lasers can be removed from the list while using this loop
         for(LaserBeam laser : this.lasers) {
-            System.out.println(laser);
+            // System.out.println(laser);
             drawLine(gfx, laser.getStartX(), laser.getStartY(), laser.getEndX(), laser.getEndY());
         }
     }
@@ -272,27 +327,79 @@ public class JFXArena extends Pane {
     }
 
 	public boolean fire(int x, int y, int x2, int y2) {
-        LaserBeam laser = new LaserBeam(x, y, x2, y2);
 
-        this.lasers.add(laser);
-        this.requestLayout();
+        CompletableFuture<Boolean> shootFuture = new CompletableFuture<Boolean>();
 
-        // TODO Change location and size of pool
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        Platform.runLater(() -> {
+            RobotInfo shooter = this.movementManager.getRobot(x, y);
+            RobotInfo target = this.movementManager.getRobot(x2, y2);
 
-        Runnable task = () -> {
-            Platform.runLater(() -> {
-                this.lasers.remove(laser);
-                this.requestLayout();
-            });
-        };
+            // Check that shooting robot isn't dead
+            if (Util.compare(shooter.getHealth(), 0.01f) == -1) {
+                shootFuture.complete(Boolean.valueOf(false));
+                return;
+            }
 
-        executor.schedule(task, 250, TimeUnit.MILLISECONDS);
+            // Return false if target is alreday dead
+            if (Util.compare(target.getHealth(), 0.01f) == -1) {
+                shootFuture.complete(Boolean.valueOf(false));
+                return;
+            }
 
-        // and finally, when your program wants to exit
-        executor.shutdown();
+            // System.out.println(Thread.currentThread().getName());
+            LaserBeam laser = new LaserBeam(x, y, x2, y2);
 
-        // TODO Check if action is legal before firing, return if fired
-		return true;
+            // Add laser to list to be rendered
+            this.lasers.add(laser);
+
+            // Subtract health if robot was hit
+            if(this.movementManager.occupied(x2, y2)) {
+                RobotInfo robot = this.movementManager.getRobot(x2, y2);
+                robot.setHealth(robot.getHealth() - 35.0f);
+
+                logger.appendText(shooter.getName() + " hit " + target.getName() + "\n");
+
+                // TODO Floating point errors here
+                if (Util.compare(robot.getHealth(), 0.01f) == -1) {
+                    // System.out.println("Stopping AI " + ((AIOne)this.ais.get(robot.getName())).getName());
+                    logger.appendText("Stopping AI " + ((AIOne)this.ais.get(robot.getName())).getName() + "\n");
+
+
+                    this.killRobot(robot.getName());
+                }
+            }
+
+            this.requestLayout();
+
+            // TODO Change location and size of pool
+            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+            // Define how to remove the laser from the screen
+            Runnable task = () -> {
+                Platform.runLater(() -> {
+                    // TODO Check if this is actually running on the GUI thread already
+                    this.lasers.remove(laser);
+                    this.requestLayout();
+                });
+            };
+
+            // Remove the laser from the screen in 250ms
+            executor.schedule(task, 250, TimeUnit.MILLISECONDS);
+
+            executor.shutdown();
+
+            shootFuture.complete(Boolean.valueOf(true));
+        });
+
+        boolean rval = false;
+
+        try {
+            rval = shootFuture.get().booleanValue();
+        } catch (CancellationException | ExecutionException | InterruptedException e) {
+            // Return false as doing nothing is always safe
+            return false;
+        }
+        
+        return rval;
 	}
 }

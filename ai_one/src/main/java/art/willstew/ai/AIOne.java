@@ -9,6 +9,11 @@ public class AIOne implements RobotAI  {
     private Thread thread = null;
     private RobotControl rc;
 
+    // TODO DELETE ME
+    public String getName() {
+        return this.rc.getRobot().getName();
+    }
+
     @Override
     public void runAI(RobotControl rc) {
         //Throw an exception if the thread is already running
@@ -25,19 +30,24 @@ public class AIOne implements RobotAI  {
             public void run() {
                 logic();
             }
+
         };
 
-        this.thread = new Thread(ai, "AI One");
+        this.thread = new Thread(ai, rc.getRobot().getName());
         this.thread.start();
     }
 
     private void logic() {
+        System.out.println("This should only run once");
+        RobotInfo me = null;
+
         try {
             String direction = "north";
+            me = this.rc.getRobot();
 
             // While the thread hasn't been stopped
-            while(!Thread.interrupted()) {
-                RobotInfo me = this.rc.getRobot();
+            while(this.thread != null) {
+                // System.out.println(me.getName() + " " + Thread.isInterrupted());
     
                 boolean fired = false;
 
@@ -53,14 +63,18 @@ public class AIOne implements RobotAI  {
                         
                         // Wait for 0.5s before shooting
                         Thread.sleep(500);
-                        this.rc.fire(robot.getX(), robot.getY());
-                        fired = true;
+                        fired = this.rc.fire(robot.getX(), robot.getY());
+                    
                         break;
                     }
                 }
 
                 if (fired) {
                     continue;
+                }
+
+                if (this.thread.isInterrupted()) {
+                    throw new InterruptedException();
                 }
 
                 // Try and move, if it fails, try the next direction
@@ -95,15 +109,27 @@ public class AIOne implements RobotAI  {
                 Thread.sleep(1000);
             }
 
-            if(Thread.interrupted()) {
-                throw new InterruptedException();
-            }
+            throw new InterruptedException();
+
         } catch(InterruptedException e) {
             // Thread has been interrupted, stopping
+            System.out.println(me.getName() + " has been stopped");
+        }
+    }
+
+    public void stopCheck() {
+        if (this.thread.isInterrupted()) {
+
         }
     }
 
     public void stop() {
+        
+        // this.thread.interrupt();
+
+
+        System.out.println("Attempting to stop " + this.getName());
+        // System.out.println("Thread has been interrupted " + this.thread.isInterrupted());
         // Throw an exception if the thread isn't running
         if(this.thread == null) {
             throw new IllegalStateException("Thread isn't running, so it can't be stopped");

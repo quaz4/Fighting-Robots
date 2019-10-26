@@ -1,6 +1,8 @@
 package art.willstew.logic;
 
-import java.util.*;
+import java.util.Hashtable;
+
+import art.willstew.robots.RobotInfo;
 
 /** 
  * Class for managing the movement of robots around the grid
@@ -10,17 +12,17 @@ public class MovementManager {
 
     private int x;
     private int y;
-    private Hashtable<String, RobotInfoImp> grid;
+    private Hashtable<String, RobotInfo> grid;
 
     public MovementManager(int x, int y) {
         // TODO Update this to fetch from config object
         this.x = x;
         this.y = y;
 
-        this.grid = new Hashtable<String, RobotInfoImp>();
+        this.grid = new Hashtable<String, RobotInfo>();
     }
 
-    public void add(RobotInfoImp robot) {
+    public void add(RobotInfo robot) {
         String hash = robot.getX() + ":" + robot.getY();
 
         this.grid.put(hash, robot);
@@ -29,7 +31,10 @@ public class MovementManager {
     /**
      * Move the robot provided, deltaX and deltaY can be positive or negative
      */
-    public boolean move(RobotInfoImp robot, int deltaX, int deltaY) {
+    public boolean move(RobotInfo robot, int deltaX, int deltaY) {
+
+        // System.out.println("Moving " + robot.getName());
+
         // Calculate the new positions
         int newX = robot.getX() + deltaX;
         int newY = robot.getY() + deltaY;
@@ -46,6 +51,12 @@ public class MovementManager {
             return false;
         }
 
+        // Don't move if robot is dead
+        // float health = this.grid.get(robot.getX() + ":" + robot.getY()).getHealth();
+        // if (Util.compare(health, 0.01f) == -1) {
+        //     return false;
+        // }
+
         // Remove from old position
         this.grid.remove(robot.getX() + ":" + robot.getY());
 
@@ -56,5 +67,19 @@ public class MovementManager {
         this.grid.put(hash, robot);
 
         return true;
+    }
+
+    public boolean occupied(int x, int y) {
+        String hash = x + ":" + y;
+        if (this.grid.containsKey(hash)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public RobotInfo getRobot(int x, int y) {
+        String hash = x + ":" + y;
+        return this.grid.get(hash);
     }
 }
