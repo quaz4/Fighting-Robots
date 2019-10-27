@@ -26,3 +26,9 @@ application {
 // GTK 3 doesn't render the window decorations and I can't click on parts of the app
 // TODO: Make this option configurable
 applicationDefaultJvmArgs = ["-Djdk.gtk.verbose=true", "-Djdk.gtk.version=2"]
+
+jar {
+    manifest {
+        attributes 'Main-Class': "art.willstew.arena.javafx.ExampleJFXApp"
+    }
+}

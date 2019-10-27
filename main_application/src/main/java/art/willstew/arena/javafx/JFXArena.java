@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import art.willstew.ai.AIOne;
+import art.willstew.ai.AITwo;
 import art.willstew.logic.LaserBeam;
 import art.willstew.logic.MovementManager;
 import art.willstew.logic.NotificationManager;
@@ -34,6 +34,10 @@ import javafx.scene.text.TextAlignment;
  * A JavaFX GUI element that displays a grid on which you can draw images, text and lines.
  */
 public class JFXArena extends Pane {
+    static final int xRange = 20;
+    static final int yRange = 20;
+
+
     // Represents the image to draw. You can modify this to introduce multiple images.
     private static final String IMAGE_FILE = "1554047213.png";
     private Image robot1;
@@ -46,7 +50,6 @@ public class JFXArena extends Pane {
     // private ArrayList<RobotControl> robotControls;
     private Hashtable<String, RobotControl> robotControls;
 
-    // TODO shot array to keep track of what shots to render
     private ArrayList<LaserBeam> lasers;
     
     // The following values are arbitrary, and you may need to modify them according to the 
@@ -66,7 +69,7 @@ public class JFXArena extends Pane {
         this.logger = logger;
 
         // TODO Update where x/y come from
-        this.movementManager = new MovementManager(12, 8);
+        this.movementManager = new MovementManager(gridWidth, gridHeight);
         this.nm = new NotificationManager();
 
         this.ais = new Hashtable<String, RobotAI>();
@@ -76,22 +79,22 @@ public class JFXArena extends Pane {
         this.lasers = new ArrayList<LaserBeam>();
 
         RobotInfoImp robotOne = new RobotInfoImp("Izzy", 2, 2, 100.0f);
-        this.addRobot(robotOne, new AIOne());
+        this.addRobot(robotOne, new AITwo());
 
-        RobotInfoImp robotTwo = new RobotInfoImp("Archie", 6, 7, 100.0f);
-        this.addRobot(robotTwo, new AIOne());
+        RobotInfoImp robotTwo = new RobotInfoImp("Archie", 11, 0, 100.0f);
+        this.addRobot(robotTwo, new AITwo());
 
-        RobotInfoImp robotThree = new RobotInfoImp("Juno", 1, 7, 100.0f);
-        this.addRobot(robotThree, new AIOne()); 
+        RobotInfoImp robotThree = new RobotInfoImp("Juno", 11, 7, 100.0f);
+        this.addRobot(robotThree, new AITwo()); 
 
         RobotInfoImp robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
-        this.addRobot(robotFour, new AIOne());
+        this.addRobot(robotFour, new AITwo());
 
         RobotInfoImp robotFive = new RobotInfoImp("Remus", 2, 4, 100.0f);
-        this.addRobot(robotFive, new AIOne());
+        this.addRobot(robotFive, new AITwo());
 
         RobotInfoImp robotSix = new RobotInfoImp("Bonnie", 2, 1, 100.0f);
-        this.addRobot(robotSix, new AIOne()); 
+        this.addRobot(robotSix, new AITwo());
 
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
@@ -326,6 +329,7 @@ public class JFXArena extends Pane {
                        (gridY2 + 0.5) * gridSquareSize);
     }
 
+    // TODO I think this needs to be changed so that the robots can
 	public boolean fire(int x, int y, int x2, int y2) {
 
         CompletableFuture<Boolean> shootFuture = new CompletableFuture<Boolean>();
@@ -362,13 +366,14 @@ public class JFXArena extends Pane {
                 // TODO Floating point errors here
                 if (Util.compare(robot.getHealth(), 0.01f) == -1) {
                     // System.out.println("Stopping AI " + ((AIOne)this.ais.get(robot.getName())).getName());
-                    logger.appendText("Stopping AI " + ((AIOne)this.ais.get(robot.getName())).getName() + "\n");
-
+                    // logger.appendText("Stopping AI " + ((AIOne)this.ais.get(robot.getName())).getName() + "\n");
 
                     this.killRobot(robot.getName());
                 }
-            }
 
+                this.nm.notification(target, shooter);
+            }
+ 
             this.requestLayout();
 
             // TODO Change location and size of pool

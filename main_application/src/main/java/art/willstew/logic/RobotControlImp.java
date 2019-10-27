@@ -14,6 +14,9 @@ public class RobotControlImp implements RobotControl {
         this.arena = arena;
         this.robot = robot;
         this.nm = nm;
+
+        this.nm.registerShooter(robot.getName());
+        this.nm.registerTarget(robot.getName());
     }
 
     @Override

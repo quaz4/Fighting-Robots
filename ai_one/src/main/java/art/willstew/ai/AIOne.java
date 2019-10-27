@@ -9,11 +9,6 @@ public class AIOne implements RobotAI  {
     private Thread thread = null;
     private RobotControl rc;
 
-    // TODO DELETE ME
-    public String getName() {
-        return this.rc.getRobot().getName();
-    }
-
     @Override
     public void runAI(RobotControl rc) {
         //Throw an exception if the thread is already running
@@ -73,7 +68,7 @@ public class AIOne implements RobotAI  {
                     continue;
                 }
 
-                if (this.thread.isInterrupted()) {
+                if (this.thread == null) {
                     throw new InterruptedException();
                 }
 
@@ -124,12 +119,6 @@ public class AIOne implements RobotAI  {
     }
 
     public void stop() {
-        
-        // this.thread.interrupt();
-
-
-        System.out.println("Attempting to stop " + this.getName());
-        // System.out.println("Thread has been interrupted " + this.thread.isInterrupted());
         // Throw an exception if the thread isn't running
         if(this.thread == null) {
             throw new IllegalStateException("Thread isn't running, so it can't be stopped");

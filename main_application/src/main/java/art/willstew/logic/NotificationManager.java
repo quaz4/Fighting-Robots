@@ -35,8 +35,17 @@ public class NotificationManager {
         String targetName = target.getName();
         String shooterName = shooter.getName();
 
-        this.targetQueues.get(targetName).add(shooter);
-        this.shooterQueues.get(shooterName).add(target);
+        try {
+            this.targetQueues.get(targetName).add(shooter);
+        } catch(NullPointerException e) {
+            // Do nothing
+        }
+
+        try {
+            this.shooterQueues.get(shooterName).add(target);
+        } catch(NullPointerException e) {
+            // Do nothing
+        }
     }
 }
 

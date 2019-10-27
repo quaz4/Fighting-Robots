@@ -23,8 +23,6 @@ public class ExampleJFXApp extends Application {
     public void start(Stage stage) {
         stage.setTitle("Fighting Robots");
 
-        // TODO Initialise robots and pass to arena
-
         TextArea logger = new TextArea();
 
         JFXArena arena = new JFXArena(logger);
@@ -35,13 +33,14 @@ public class ExampleJFXApp extends Application {
         toolbar.getItems().addAll(btn1, btn2);
         
         btn1.setOnAction((event) -> {
-            System.out.println("Starting...");
-            logger.appendText("Game start\n");
+            System.out.println("Game started");
+            logger.appendText("Game started\n");
             arena.start();
         });
 
         btn2.setOnAction((event) -> {
-            System.out.println("Stopping...");
+            System.out.println("Stopping game\n");
+            logger.appendText("Stopping game\n");
             arena.stop();
         });
         
