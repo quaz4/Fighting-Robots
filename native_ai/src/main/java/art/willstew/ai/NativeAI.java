@@ -44,6 +44,7 @@ public class NativeAI implements RobotAI  {
         this.thread.start();
     }
 
+    // Declaration for native method
     private native void logic(RobotControl rc) throws InterruptedException;
 
     public void stop() {

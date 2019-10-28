@@ -4,6 +4,10 @@ import art.willstew.robots.RobotAI;
 import art.willstew.robots.RobotControl;
 import art.willstew.robots.RobotInfo;
 
+/**
+ * Basic robot implementation
+ * Will attempt to shoot, then move, then repeat
+ */
 public class AIOne implements RobotAI  {
 
     private Thread thread = null;
@@ -28,12 +32,13 @@ public class AIOne implements RobotAI  {
 
         };
 
+        // Start the thread with the same name as the robot
         this.thread = new Thread(ai, rc.getRobot().getName());
         this.thread.start();
     }
 
+    // Controls what the robot should do next
     private void logic() {
-        System.out.println("This should only run once");
         RobotInfo me = null;
 
         try {
@@ -102,7 +107,6 @@ public class AIOne implements RobotAI  {
 
         } catch(InterruptedException e) {
             // Thread has been interrupted, stopping
-            System.out.println(me.getName() + " has been stopped");
         }
     }
 

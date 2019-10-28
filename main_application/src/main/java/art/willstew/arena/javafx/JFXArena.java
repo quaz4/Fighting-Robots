@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import art.willstew.ai.AIOne;
+import art.willstew.ai.AITwo;
 import art.willstew.ai.NativeAI;
 import art.willstew.logic.LaserBeam;
 import art.willstew.logic.MovementManager;
@@ -32,6 +34,7 @@ import javafx.scene.text.TextAlignment;
 
 /**
  * A JavaFX GUI element that displays a grid on which you can draw images, text and lines.
+ * It also
  */
 public class JFXArena extends Pane {
     static final int xRange = 20;
@@ -49,7 +52,6 @@ public class JFXArena extends Pane {
     private ArrayList<RobotInfo> robotInfo;
     // private ArrayList<RobotControl> robotControls;
     private Hashtable<String, RobotControl> robotControls;
-
     private ArrayList<LaserBeam> lasers;
     
     // The following values are arbitrary, and you may need to modify them according to the 
@@ -60,6 +62,7 @@ public class JFXArena extends Pane {
     private Canvas canvas; // Used to provide a 'drawing surface'.
 
     private TextArea logger;
+    private ScheduledExecutorService executor;
 
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
@@ -68,7 +71,6 @@ public class JFXArena extends Pane {
 
         this.logger = logger;
 
-        // TODO Update where x/y come from
         this.movementManager = new MovementManager(gridWidth, gridHeight);
         this.nm = new NotificationManager();
 
@@ -78,23 +80,28 @@ public class JFXArena extends Pane {
 
         this.lasers = new ArrayList<LaserBeam>();
 
-        RobotInfoImp robotOne = new RobotInfoImp("Izzy", 2, 2, 100.0f);
-        this.addRobot(robotOne, new NativeAI());
+        try {
+            RobotInfoImp robotOne = new RobotInfoImp("Izzy", 2, 2, 100.0f);
+            this.addRobot(robotOne, new AIOne());
 
-        RobotInfoImp robotTwo = new RobotInfoImp("Archie", 11, 0, 100.0f);
-        this.addRobot(robotTwo, new NativeAI());
+            RobotInfoImp robotTwo = new RobotInfoImp("Archie", 11, 0, 100.0f);
+            this.addRobot(robotTwo, new AIOne());
 
-        RobotInfoImp robotThree = new RobotInfoImp("Juno", 11, 7, 100.0f);
-        this.addRobot(robotThree, new NativeAI());
+            RobotInfoImp robotThree = new RobotInfoImp("Remus", 2, 4, 100.0f);
+            this.addRobot(robotThree, new AITwo());
 
-        RobotInfoImp robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
-        this.addRobot(robotFour, new NativeAI());
+            RobotInfoImp robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
+            this.addRobot(robotFour, new AITwo());
 
-        RobotInfoImp robotFive = new RobotInfoImp("Remus", 2, 4, 100.0f);
-        this.addRobot(robotFive, new NativeAI());
+            RobotInfoImp robotFive = new RobotInfoImp("Juno", 11, 7, 100.0f);
+            this.addRobot(robotFive, new NativeAI());
 
-        RobotInfoImp robotSix = new RobotInfoImp("Bonnie", 2, 1, 100.0f);
-        this.addRobot(robotSix, new NativeAI());
+            RobotInfoImp robotSix = new RobotInfoImp("Bonnie", 2, 1, 100.0f);
+            this.addRobot(robotSix, new NativeAI());  
+        } catch (IllegalStateException e) {
+            // Ignore, try and run the program with however many robots are there
+        }
+
 
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
@@ -108,9 +115,19 @@ public class JFXArena extends Pane {
         getChildren().add(canvas);
 
         this.requestLayout();
+
+        this.executor = Executors.newScheduledThreadPool(this.robotInfo.size());
     }
 
+    // Setup each robot by registering it with specic lists and managers
     public void addRobot(RobotInfo robot, RobotAI ai) {
+        // Ensure that no robot has a duplicate name
+        for (RobotInfo info : this.robotInfo) {
+            if (robot.getName().equals(info.getName())) {
+                throw new IllegalStateException("Cannot have a robot with duplicate names");
+            }
+        }
+
         this.ais.put(robot.getName(), ai);
         this.robotInfo.add(robot);
         this.movementManager.add(robot);
@@ -128,7 +145,7 @@ public class JFXArena extends Pane {
             try {
                 ai.stop();
             } catch (IllegalStateException e) {
-                //TODO: handle exception
+                // Safe to ignore
             }
             
         }
@@ -144,7 +161,6 @@ public class JFXArena extends Pane {
             if (robot.getName().equals(name)) {
                 this.ais.get(robot.getName()).stop();
                 logger.appendText(robot.getName() + " is now dead\n");
-                // this.robotInfo.remove(robot);
                 
                 this.checkEndGame();
                 break;
@@ -152,6 +168,12 @@ public class JFXArena extends Pane {
         }
     }
 
+    /**
+     * Checks to see if the game has ended by counting the number of
+     * robots left alive.
+     * 
+     * Usually called after a robot has been killed
+     */
     public void checkEndGame() {
         int alive = 0;
         RobotInfo lastRobot = null;
@@ -234,19 +256,14 @@ public class JFXArena extends Pane {
             gfx.strokeLine(0.0, y, arenaPixelWidth, y);
         }
 
-        // Invoke helper methods to draw things at the current location.
-        // ** You will need to adapt this to the requirements of your application. **
-
+        // Draw robots and labels
         for(RobotInfo robot : this.robotInfo) {
             drawImage(gfx, robot1, robot.getX(), robot.getY());
             drawLabel(gfx, robot.toString(), robot.getX(), robot.getY());
         }
 
-        // drawLine(gfx, robotX, robotY, one, two);
-        // Draw lines here
-        // TODO This needs to be synchronised, as lasers can be removed from the list while using this loop
+        // Draw lines for lasers
         for(LaserBeam laser : this.lasers) {
-            // System.out.println(laser);
             drawLine(gfx, laser.getStartX(), laser.getStartY(), laser.getEndX(), laser.getEndY());
         }
     }
@@ -329,7 +346,10 @@ public class JFXArena extends Pane {
                        (gridY2 + 0.5) * gridSquareSize);
     }
 
-    // TODO I think this needs to be changed so that the robots can
+    /**
+     * Fires a shot from x,y to x2,y2
+     * Performs logic on the GUI thread to avoid race conditions
+     */
 	public boolean fire(int x, int y, int x2, int y2) {
 
         CompletableFuture<Boolean> shootFuture = new CompletableFuture<Boolean>();
@@ -363,7 +383,6 @@ public class JFXArena extends Pane {
 
                 logger.appendText(shooter.getName() + " hit " + target.getName() + "\n");
 
-                // TODO Floating point errors here
                 if (Util.compare(robot.getHealth(), 0.01f) == -1) {
                     // System.out.println("Stopping AI " + ((AIOne)this.ais.get(robot.getName())).getName());
                     // logger.appendText("Stopping AI " + ((AIOne)this.ais.get(robot.getName())).getName() + "\n");
@@ -376,13 +395,9 @@ public class JFXArena extends Pane {
  
             this.requestLayout();
 
-            // TODO Change location and size of pool
-            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-
             // Define how to remove the laser from the screen
             Runnable task = () -> {
                 Platform.runLater(() -> {
-                    // TODO Check if this is actually running on the GUI thread already
                     this.lasers.remove(laser);
                     this.requestLayout();
                 });
@@ -390,8 +405,6 @@ public class JFXArena extends Pane {
 
             // Remove the laser from the screen in 250ms
             executor.schedule(task, 250, TimeUnit.MILLISECONDS);
-
-            executor.shutdown();
 
             shootFuture.complete(Boolean.valueOf(true));
         });

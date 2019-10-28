@@ -6,7 +6,7 @@ import art.willstew.robots.RobotInfo;
 
 public class RobotControlImp implements RobotControl {
 
-    private JFXArena arena;
+    private JFXArena arena; 
     private RobotInfo robot; // A reference to the robot this controller controls
     private NotificationManager nm;
 

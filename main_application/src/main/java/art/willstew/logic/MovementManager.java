@@ -6,6 +6,10 @@ import art.willstew.robots.RobotInfo;
 
 /** 
  * Class for managing the movement of robots around the grid
+ * 
+ * It uses a Hashtable for quick access to where each of the robots is
+ * Each robot is keyed to its x value and y value, seperated by :
+ * e.g. x = 10 and y = 2 would have a key of 10:2
  */
 
 public class MovementManager {
@@ -15,7 +19,6 @@ public class MovementManager {
     private Hashtable<String, RobotInfo> grid;
 
     public MovementManager(int x, int y) {
-        // TODO Update this to fetch from config object
         this.x = x;
         this.y = y;
 
@@ -30,6 +33,7 @@ public class MovementManager {
 
     /**
      * Move the robot provided, deltaX and deltaY can be positive or negative
+     * and specify how far to move in each direction
      */
     public boolean move(RobotInfo robot, int deltaX, int deltaY) {
 
@@ -40,7 +44,6 @@ public class MovementManager {
         int newY = robot.getY() + deltaY;
 
         // Invalid move if outside the grid
-        // TODO Revisit when working on Config object
         if (newX >= this.x || newX < 0 || newY >= this.y || newY < 0) {
             return false;
         }
@@ -50,12 +53,6 @@ public class MovementManager {
         if (this.grid.containsKey(hash)) {
             return false;
         }
-
-        // Don't move if robot is dead
-        // float health = this.grid.get(robot.getX() + ":" + robot.getY()).getHealth();
-        // if (Util.compare(health, 0.01f) == -1) {
-        //     return false;
-        // }
 
         // Remove from old position
         this.grid.remove(robot.getX() + ":" + robot.getY());

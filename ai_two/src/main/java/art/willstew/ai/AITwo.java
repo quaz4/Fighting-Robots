@@ -6,6 +6,11 @@ import art.willstew.robots.RobotAI;
 import art.willstew.robots.RobotControl;
 import art.willstew.robots.RobotInfo;
 
+/**
+ * An implementation of RobotAI
+ * This AI will move towards a randomly selected target
+ * It will move towards the last robot to shoot it
+ */
 public class AITwo implements RobotAI  {
 
     private Thread thread = null;
@@ -31,12 +36,13 @@ public class AITwo implements RobotAI  {
 
         };
 
+        // Start a thread with the name of the robot
         this.thread = new Thread(ai, rc.getRobot().getName());
         this.thread.start();
     }
 
+    // Specifies how the AI behaves
     private void logic() {
-        System.out.println("This should only run once");
         RobotInfo me = null;
 
         try {
@@ -48,7 +54,6 @@ public class AITwo implements RobotAI  {
 
             // While the thread hasn't been stopped
             while(this.thread != null) {
-                // System.out.println(me.getName() + " " + Thread.isInterrupted());
     
                 RobotInfo notification = this.rc.hitTaken();
 
@@ -56,11 +61,10 @@ public class AITwo implements RobotAI  {
                     this.target = notification;
                 }
 
+                // Find a random target that isn't dead
                 while(target.getHealth() < 0.0001f || target == me) {
                     this.target = this.randomTarget();
                 }   
-
-                System.out.println(me.getName() + " is after " + this.target.getName());
 
                 // Itterate over all the other robots in the game
                 for (RobotInfo robot : this.rc.getAllRobots()) {
@@ -99,7 +103,7 @@ public class AITwo implements RobotAI  {
                     }
                 }
 
-                 // Try and move, if it fails, try the next direction
+                // Try and move, if it fails, try the next direction
                 switch (direction) {
                     case "north":
                         if(!this.rc.moveNorth()) {
@@ -132,7 +136,6 @@ public class AITwo implements RobotAI  {
 
         } catch(InterruptedException e) {
             // Thread has been interrupted, stopping
-            System.out.println(me.getName() + " has been stopped");
         }
     }
 

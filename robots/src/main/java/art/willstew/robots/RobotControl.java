@@ -1,5 +1,9 @@
 package art.willstew.robots;
 
+/**
+ * Interface for the RobotControl API
+ * Specifies each of the actions that an implementation of the API should be able to make
+ */
 public interface RobotControl {
  
     public RobotInfo getRobot();
