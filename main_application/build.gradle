@@ -8,6 +8,7 @@ dependencies {
     compile project(':robots')
     compile project(':ai_one')
     compile project(':ai_two')
+    compile project(':native_ai')
 }
 
 repositories {
@@ -22,9 +23,10 @@ application {
     mainClassName = "art.willstew.arena.javafx.ExampleJFXApp"
 }
 
+// systemProperty "java.library.path", "/Users/stewwf/Projects/Fighting-Robots/native_ai/build/libs/nativeimp/shared"
+
 // There is an issue with GTK 3 on my local machine, I need to run using GTK 2 in order to resolve it
 // GTK 3 doesn't render the window decorations and I can't click on parts of the app
-// TODO: Make this option configurable
 applicationDefaultJvmArgs = ["-Djdk.gtk.verbose=true", "-Djdk.gtk.version=2"]
 
 jar {

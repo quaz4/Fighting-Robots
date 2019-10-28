@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import art.willstew.ai.AITwo;
+import art.willstew.ai.*;
 import art.willstew.logic.LaserBeam;
 import art.willstew.logic.MovementManager;
 import art.willstew.logic.NotificationManager;
@@ -82,10 +82,10 @@ public class JFXArena extends Pane {
         this.addRobot(robotOne, new AITwo());
 
         RobotInfoImp robotTwo = new RobotInfoImp("Archie", 11, 0, 100.0f);
-        this.addRobot(robotTwo, new AITwo());
+        this.addRobot(robotTwo, new AIOne());
 
         RobotInfoImp robotThree = new RobotInfoImp("Juno", 11, 7, 100.0f);
-        this.addRobot(robotThree, new AITwo()); 
+        this.addRobot(robotThree, new NativeAI());
 
         RobotInfoImp robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
         this.addRobot(robotFour, new AITwo());
