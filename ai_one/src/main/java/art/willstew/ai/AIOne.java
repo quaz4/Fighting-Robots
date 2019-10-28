@@ -42,7 +42,6 @@ public class AIOne implements RobotAI  {
 
             // While the thread hasn't been stopped
             while(this.thread != null) {
-                // System.out.println(me.getName() + " " + Thread.isInterrupted());
     
                 boolean fired = false;
 
@@ -55,9 +54,7 @@ public class AIOne implements RobotAI  {
                         && (Math.abs(me.getX() - robot.getX()) <= 2)
                         && (Math.abs(me.getY() - robot.getY()) <= 2)
                         ) {
-                        
-                        // Wait for 0.5s before shooting
-                        Thread.sleep(500);
+
                         fired = this.rc.fire(robot.getX(), robot.getY());
                     
                         break;
@@ -99,9 +96,6 @@ public class AIOne implements RobotAI  {
                             break;
                         }
                 }
-
-                // Wait for 1s
-                Thread.sleep(1000);
             }
 
             throw new InterruptedException();

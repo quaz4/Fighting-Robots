@@ -72,9 +72,6 @@ public class AITwo implements RobotAI  {
                         && (Math.abs(me.getY() - robot.getY()) <= 2)
                         && robot.getHealth() > 0.0f
                         ) {
-                        
-                        // Wait for 0.5s before shooting
-                        Thread.sleep(500);
 
                         this.rc.fire(robot.getX(), robot.getY());
                     
@@ -129,9 +126,6 @@ public class AITwo implements RobotAI  {
                             break;
                         }
                 }
-
-                // Wait for 1s
-                Thread.sleep(1000);
             }
 
             throw new InterruptedException();

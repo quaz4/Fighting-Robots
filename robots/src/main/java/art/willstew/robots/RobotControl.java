@@ -6,15 +6,15 @@ public interface RobotControl {
 
     public RobotInfo[] getAllRobots();
 
-    public boolean moveNorth();
+    public boolean moveNorth() throws InterruptedException;
 
-    public boolean moveEast();
+    public boolean moveEast() throws InterruptedException;
 
-    public boolean moveSouth();
+    public boolean moveSouth() throws InterruptedException;
 
-    public boolean moveWest();
+    public boolean moveWest() throws InterruptedException;
 
-    public boolean fire(int x, int y);
+    public boolean fire(int x, int y) throws InterruptedException;
 
     public RobotInfo hitMade();
 

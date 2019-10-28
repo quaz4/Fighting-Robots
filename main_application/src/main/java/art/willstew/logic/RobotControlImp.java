@@ -30,27 +30,32 @@ public class RobotControlImp implements RobotControl {
     }
 
     @Override
-    public boolean moveNorth() {
+    public boolean moveNorth() throws InterruptedException {
+        Thread.sleep(1000);
         return this.arena.move((RobotInfoImp)this.getRobot(), 0, -1);
     }
 
     @Override
-    public boolean moveEast() {
+    public boolean moveEast() throws InterruptedException {
+        Thread.sleep(1000);
         return this.arena.move((RobotInfoImp)this.getRobot(), 1, 0);
     }
 
     @Override
-    public boolean moveSouth() {
+    public boolean moveSouth() throws InterruptedException {
+        Thread.sleep(1000);
         return this.arena.move((RobotInfoImp)this.getRobot(), 0, 1);
     }
 
     @Override
-    public boolean moveWest() {
+    public boolean moveWest() throws InterruptedException {
+        Thread.sleep(1000);
         return this.arena.move((RobotInfoImp)this.getRobot(), -1, 0);
     }
 
     @Override
-    public boolean fire(int x, int y) {
+    public boolean fire(int x, int y) throws InterruptedException {
+        Thread.sleep(500);
         return this.arena.fire(this.robot.getX(), this.robot.getY(), x, y);
     }
 

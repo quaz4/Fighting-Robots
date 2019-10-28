@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import art.willstew.ai.*;
+import art.willstew.ai.NativeAI;
 import art.willstew.logic.LaserBeam;
 import art.willstew.logic.MovementManager;
 import art.willstew.logic.NotificationManager;
@@ -79,22 +79,22 @@ public class JFXArena extends Pane {
         this.lasers = new ArrayList<LaserBeam>();
 
         RobotInfoImp robotOne = new RobotInfoImp("Izzy", 2, 2, 100.0f);
-        this.addRobot(robotOne, new AITwo());
+        this.addRobot(robotOne, new NativeAI());
 
         RobotInfoImp robotTwo = new RobotInfoImp("Archie", 11, 0, 100.0f);
-        this.addRobot(robotTwo, new AIOne());
+        this.addRobot(robotTwo, new NativeAI());
 
         RobotInfoImp robotThree = new RobotInfoImp("Juno", 11, 7, 100.0f);
         this.addRobot(robotThree, new NativeAI());
 
         RobotInfoImp robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
-        this.addRobot(robotFour, new AITwo());
+        this.addRobot(robotFour, new NativeAI());
 
         RobotInfoImp robotFive = new RobotInfoImp("Remus", 2, 4, 100.0f);
-        this.addRobot(robotFive, new AITwo());
+        this.addRobot(robotFive, new NativeAI());
 
         RobotInfoImp robotSix = new RobotInfoImp("Bonnie", 2, 1, 100.0f);
-        this.addRobot(robotSix, new AITwo());
+        this.addRobot(robotSix, new NativeAI());
 
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
@@ -345,7 +345,7 @@ public class JFXArena extends Pane {
             }
 
             // Return false if target is alreday dead
-            if (Util.compare(target.getHealth(), 0.01f) == -1) {
+            if (target != null && Util.compare(target.getHealth(), 0.01f) == -1) {
                 shootFuture.complete(Boolean.valueOf(false));
                 return;
             }

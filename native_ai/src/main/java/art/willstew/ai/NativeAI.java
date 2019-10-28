@@ -10,7 +10,7 @@ public class NativeAI implements RobotAI  {
 
     static {
         try {
-            System.load("/Users/stewwf/Projects/Fighting-Robots/native_ai/build/libs/nativeimp/shared/libnativeimp.dylib");
+            System.loadLibrary("nativeimp");
         } catch (Error e) {
             System.out.println(e);
         }
@@ -30,7 +30,12 @@ public class NativeAI implements RobotAI  {
         
             @Override
             public void run() {
-                logic(rc);
+                try {
+                    logic(rc);
+                } catch (InterruptedException e) {
+                    thread = null;
+                }
+                
             }
 
         };
@@ -39,7 +44,7 @@ public class NativeAI implements RobotAI  {
         this.thread.start();
     }
 
-    private native void logic(RobotControl rc);
+    private native void logic(RobotControl rc) throws InterruptedException;
 
     public void stop() {
         // Throw an exception if the thread isn't running
