@@ -66,6 +66,7 @@ JNIEXPORT void JNICALL Java_art_willstew_ai_NativeAI_logic(JNIEnv *env, jobject 
             }
 
             if ((abs(meX - targetX) <= 2) && (abs(meY - targetY) <= 2)) {
+                // TODO Check if target is alive
                 // FIRE!
                 (*env)->CallBooleanMethod(env, rc, fire, targetX, targetY);
                 if ((*env)->ExceptionCheck(env)) {

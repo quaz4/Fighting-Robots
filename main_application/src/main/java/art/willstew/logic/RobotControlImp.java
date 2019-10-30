@@ -1,17 +1,16 @@
 package art.willstew.logic;
 
-import art.willstew.arena.javafx.JFXArena;
 import art.willstew.robots.RobotControl;
 import art.willstew.robots.RobotInfo;
 
 public class RobotControlImp implements RobotControl {
 
-    private JFXArena arena; 
+    private Game game; 
     private RobotInfo robot; // A reference to the robot this controller controls
     private NotificationManager nm;
 
-    public RobotControlImp(JFXArena arena, RobotInfo robot, NotificationManager nm) {
-        this.arena = arena;
+    public RobotControlImp(Game game, RobotInfo robot, NotificationManager nm) {
+        this.game = game;
         this.robot = robot;
         this.nm = nm;
 
@@ -26,37 +25,37 @@ public class RobotControlImp implements RobotControl {
 
     @Override
     public RobotInfo[] getAllRobots() {
-        return this.arena.getAllRobots();
+        return this.game.getAllRobots();
     }
 
     @Override
     public boolean moveNorth() throws InterruptedException {
         Thread.sleep(1000);
-        return this.arena.move((RobotInfoImp)this.getRobot(), 0, -1);
+        return this.game.move((RobotInfoImp)this.getRobot(), 0, -1);
     }
 
     @Override
     public boolean moveEast() throws InterruptedException {
         Thread.sleep(1000);
-        return this.arena.move((RobotInfoImp)this.getRobot(), 1, 0);
+        return this.game.move((RobotInfoImp)this.getRobot(), 1, 0);
     }
 
     @Override
     public boolean moveSouth() throws InterruptedException {
         Thread.sleep(1000);
-        return this.arena.move((RobotInfoImp)this.getRobot(), 0, 1);
+        return this.game.move((RobotInfoImp)this.getRobot(), 0, 1);
     }
 
     @Override
     public boolean moveWest() throws InterruptedException {
         Thread.sleep(1000);
-        return this.arena.move((RobotInfoImp)this.getRobot(), -1, 0);
+        return this.game.move((RobotInfoImp)this.getRobot(), -1, 0);
     }
 
     @Override
     public boolean fire(int x, int y) throws InterruptedException {
         Thread.sleep(500);
-        return this.arena.fire(this.robot.getX(), this.robot.getY(), x, y);
+        return this.game.fire(this.robot.getX(), this.robot.getY(), x, y);
     }
 
     @Override

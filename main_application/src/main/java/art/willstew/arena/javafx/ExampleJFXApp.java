@@ -1,7 +1,7 @@
 package art.willstew.arena.javafx;
 
-// import java.beans.EventHandler;
-
+import art.willstew.ai.*;
+import art.willstew.logic.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -23,10 +23,39 @@ public class ExampleJFXApp extends Application {
     public void start(Stage stage) {
         stage.setTitle("Fighting Robots");
 
-        TextArea logger = new TextArea();
+        int gridWidth = 12;
+        int gridHeight = 8;
 
-        JFXArena arena = new JFXArena(logger);
-        
+        TextArea logger = new TextArea();
+        JFXArena arena = new JFXArena();
+        MovementManager mm = new MovementManager(gridWidth, gridHeight);
+        NotificationManager nm = new NotificationManager();
+
+        Game game = new Game(arena, logger, mm, nm);
+        arena.registerGame(game);
+
+        try {
+            RobotInfoImp robotOne = new RobotInfoImp("Izzy", 2, 2, 100.0f);
+            game.addRobot(robotOne, new AIOne());
+
+            RobotInfoImp robotTwo = new RobotInfoImp("Archie", 11, 0, 100.0f);
+            game.addRobot(robotTwo, new AIOne());
+
+            RobotInfoImp robotThree = new RobotInfoImp("Remus", 2, 4, 100.0f);
+            game.addRobot(robotThree, new AITwo());
+
+            RobotInfoImp robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
+            game.addRobot(robotFour, new AITwo());
+
+            // RobotInfoImp robotFive = new RobotInfoImp("Juno", 11, 7, 100.0f);
+            // game.addRobot(robotFive, new NativeAI());
+
+            // RobotInfoImp robotSix = new RobotInfoImp("Bonnie", 2, 1, 100.0f);
+            // game.addRobot(robotSix, new NativeAI());  
+        } catch (IllegalStateException e) {
+            // Ignore, try and run the program with however many robots are there
+        }
+
         ToolBar toolbar = new ToolBar();
         Button btn1 = new Button("Start");
         Button btn2 = new Button("Stop");
@@ -35,13 +64,15 @@ public class ExampleJFXApp extends Application {
         btn1.setOnAction((event) -> {
             System.out.println("Game started");
             logger.appendText("Game started\n");
-            arena.start();
+            // arena.start();
+            game.start();
         });
 
         btn2.setOnAction((event) -> {
             System.out.println("Stopping game\n");
             logger.appendText("Stopping game\n");
-            arena.stop();
+            // arena.stop();
+            game.stop();
         });
         
         SplitPane splitPane = new SplitPane();
@@ -62,15 +93,12 @@ public class ExampleJFXApp extends Application {
                 Platform.exit();
 
                 try {
-                    arena.stop();
+                    // arena.stop();
+                    game.stop();
                 } catch(IllegalStateException e) {
                     // Safe to ignore
                 }
             }
         });
-    }
-
-    public void log(String message) {
-        
     }
 }

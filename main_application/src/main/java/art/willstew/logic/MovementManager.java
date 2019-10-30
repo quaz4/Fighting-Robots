@@ -14,6 +14,8 @@ import art.willstew.robots.RobotInfo;
 
 public class MovementManager {
 
+    private Object monitor = new Object();
+
     private int x;
     private int y;
     private Hashtable<String, RobotInfo> grid;
@@ -25,10 +27,12 @@ public class MovementManager {
         this.grid = new Hashtable<String, RobotInfo>();
     }
 
+    // Add a new robot to the grid
     public void add(RobotInfo robot) {
-        String hash = robot.getX() + ":" + robot.getY();
-
-        this.grid.put(hash, robot);
+        synchronized(monitor) {
+            String hash = robot.getX() + ":" + robot.getY();
+            this.grid.put(hash, robot);
+        }
     }
 
     /**
@@ -36,9 +40,6 @@ public class MovementManager {
      * and specify how far to move in each direction
      */
     public boolean move(RobotInfo robot, int deltaX, int deltaY) {
-
-        // System.out.println("Moving " + robot.getName());
-
         // Calculate the new positions
         int newX = robot.getX() + deltaX;
         int newY = robot.getY() + deltaY;
@@ -48,35 +49,41 @@ public class MovementManager {
             return false;
         }
 
-        // Invalid move if grid is occupied
-        String hash = newX + ":" + newY;
-        if (this.grid.containsKey(hash)) {
-            return false;
+        synchronized(monitor) {
+            // Invalid move if grid is occupied
+            String hash = newX + ":" + newY;
+            if (this.grid.containsKey(hash)) {
+                return false;
+            }
+
+            // Remove from old position
+            this.grid.remove(robot.getX() + ":" + robot.getY());
+
+            robot.setX(newX);
+            robot.setY(newY);
+
+            // Return to new position
+            this.grid.put(hash, robot);
         }
-
-        // Remove from old position
-        this.grid.remove(robot.getX() + ":" + robot.getY());
-
-        robot.setX(newX);
-        robot.setY(newY);
-
-        // Return to new position
-        this.grid.put(hash, robot);
 
         return true;
     }
 
     public boolean occupied(int x, int y) {
-        String hash = x + ":" + y;
-        if (this.grid.containsKey(hash)) {
-            return true;
+        synchronized(monitor) {
+            String hash = x + ":" + y;
+            if (this.grid.containsKey(hash)) {
+                return true;
+            }
+    
+            return false;
         }
-
-        return false;
     }
 
     public RobotInfo getRobot(int x, int y) {
-        String hash = x + ":" + y;
-        return this.grid.get(hash);
+        synchronized(monitor) {
+            String hash = x + ":" + y;
+            return this.grid.get(hash);
+        }
     }
 }
