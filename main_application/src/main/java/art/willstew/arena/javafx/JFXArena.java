@@ -1,6 +1,8 @@
 package art.willstew.arena.javafx;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,21 +23,18 @@ import javafx.scene.text.TextAlignment;
  * It also
  */
 public class JFXArena extends Pane {
-    static final int xRange = 20;
-    static final int yRange = 20;
-
     // Represents the image to draw. You can modify this to introduce multiple images.
     private static final String IMAGE_FILE = "1554047213.png";
-    private Image robot1;
+    private Image robotImage;
     
     // The following values are arbitrary, and you may need to modify them according to the 
     // requirements of your application.
-    private int gridWidth = 12;
-    private int gridHeight = 8;
+    private int gridWidth;
+    private int gridHeight;
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
 
-    private ArrayList<LaserBeam> lasers; // TODO synchronized?
+    private List<LaserBeam> lasers; // List to keep track of the lasers to draw
     private Game game;
 
     private ScheduledExecutorService executor;
@@ -43,11 +42,13 @@ public class JFXArena extends Pane {
     /**
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
-    public JFXArena() {
+    public JFXArena(int gridWidth, int gridHeight) {
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
 
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
-        robot1 = new Image(getClass().getClassLoader().getResourceAsStream(IMAGE_FILE));
+        robotImage = new Image(getClass().getClassLoader().getResourceAsStream(IMAGE_FILE));
         
         // You will get an exception here if the specified image file cannot be found.
         
@@ -56,10 +57,11 @@ public class JFXArena extends Pane {
         canvas.heightProperty().bind(heightProperty());
         getChildren().add(canvas);
 
-        this.lasers = new ArrayList<LaserBeam>();
+        this.lasers = Collections.synchronizedList(new ArrayList<LaserBeam>());
 
         // this.executor = Executors.newScheduledThreadPool(this.robotInfo.size());
-        this.executor = Executors.newScheduledThreadPool(1); // TODO
+        // System.out.println(this.game.getAllRobots().length);
+        this.executor = Executors.newScheduledThreadPool(8);
 
         this.requestLayout();
     }
@@ -73,7 +75,7 @@ public class JFXArena extends Pane {
     public void registerGame(Game game) {
         this.game = game;
     }
-        
+
     /**
      * This method is called in order to redraw the screen, either because the user is manipulating 
      * the window, OR because you've called 'requestLayout()'.
@@ -110,7 +112,7 @@ public class JFXArena extends Pane {
 
         // Draw robots and labels
         for(RobotInfo robot : this.game.getAllRobots()) {
-            drawImage(gfx, robot1, robot.getX(), robot.getY());
+            drawImage(gfx, robotImage, robot.getX(), robot.getY());
             drawLabel(gfx, robot.toString(), robot.getX(), robot.getY());
         }
 
@@ -136,8 +138,8 @@ public class JFXArena extends Pane {
         // We also need to know how "big" to make the image. The image file has a natural width 
         // and height, but that's not necessarily the size we want to draw it on the screen. We 
         // do, however, want to preserve its aspect ratio.
-        double fullSizePixelWidth = robot1.getWidth();
-        double fullSizePixelHeight = robot1.getHeight();
+        double fullSizePixelWidth = robotImage.getWidth();
+        double fullSizePixelHeight = robotImage.getHeight();
         
         double displayedPixelWidth, displayedPixelHeight;
         if(fullSizePixelWidth > fullSizePixelHeight) {

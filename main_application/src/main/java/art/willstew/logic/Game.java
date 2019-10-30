@@ -1,15 +1,16 @@
 package art.willstew.logic;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import art.willstew.arena.javafx.JFXArena;
 import art.willstew.robots.RobotInfo;
 import javafx.scene.control.TextArea;
 import art.willstew.robots.*;
-
-// TODO Review use of synchronized
 
 /**
  * The Game class handles all of the game logic
@@ -25,18 +26,24 @@ public class Game {
     private NotificationManager nm;
 
     private Hashtable<String, RobotAI> ais;
-    private ArrayList<RobotInfo> ri;
+    private List<RobotInfo> ri;
     private Hashtable<String, RobotControl> rc;
 
-    public Game(JFXArena arena, TextArea logger, MovementManager mm, NotificationManager nm) {
+    private int gridWidth;
+    private int gridHeight;
+
+    public Game(JFXArena arena, TextArea logger, MovementManager mm, NotificationManager nm, int x, int y) {
         this.arena = arena; // GUI Grid
         this.logger = logger; // Text output about game actions
         this.mm = mm; // MovementManager
         this.nm = nm; // NotificationManger
 
         this.ais = new Hashtable<String, RobotAI>();
-        this.ri = new ArrayList<RobotInfo>(); // TODO Make thread safe // RobotInfo
+        this.ri = Collections.synchronizedList(new ArrayList<RobotInfo>()); // TODO Make thread safe // RobotInfo
         this.rc = new Hashtable<String, RobotControl>(); // RobotControl
+
+        this.gridWidth = x;
+        this.gridHeight = y;
     }
 
     /**
@@ -50,6 +57,10 @@ public class Game {
                 if (robot.getName().equals(info.getName())) {
                     throw new IllegalStateException("Cannot have a robot with duplicate names");
                 }
+            }
+
+            if(robot.getX() > this.gridWidth - 1 || robot.getY() > this.gridHeight - 1) {
+                throw new InvalidParameterException("Robot not in grid");
             }
 
             this.ais.put(robot.getName(), ai); // Add robots ai to list
@@ -69,7 +80,7 @@ public class Game {
             for (RobotInfo robot : this.ri.toArray(new RobotInfo[this.ri.size()])) {
                 if (robot.getName().equals(name)) {
                     this.ais.get(robot.getName()).stop();
-                    logger.appendText(robot.getName() + " is now dead\n");
+                    this.logger.appendText(robot.getName() + " is now dead\n");
                     
                     this.checkEndGame();
                     break;
@@ -103,39 +114,41 @@ public class Game {
     }
 
     public boolean fire(int x, int y, int x2, int y2) {
-        RobotInfo shooter = this.mm.getRobot(x, y);
-        RobotInfo target = this.mm.getRobot(x2, y2);
-
-        // Check that shooting robot isn't dead
-        if (Util.compare(shooter.getHealth(), 0.01f) == -1) {
-            return false;
-        }
-
-        // Return false if target is alreday dead
-        if (target != null && Util.compare(target.getHealth(), 0.01f) == -1) {
-            return false;
-        }
-
-        LaserBeam laser = new LaserBeam(x, y, x2, y2);
-
-        this.arena.fire(laser);
-
-        // Subtract health if robot was hit
-        if(this.mm.occupied(x2, y2)) {
-            // TODO Review the use of the new Robot variable
-            RobotInfo robot = this.mm.getRobot(x2, y2);
-            robot.setHealth(robot.getHealth() - 35.0f);
-
-            logger.appendText(shooter.getName() + " hit " + target.getName() + "\n");
-
-            if (Util.compare(robot.getHealth(), 0.01f) == -1) {
-                this.killRobot(robot.getName());
+        synchronized(monitor) {
+            RobotInfo shooter = this.mm.getRobot(x, y);
+            RobotInfo target = this.mm.getRobot(x2, y2);
+    
+            // Check that shooting robot isn't dead
+            if (Util.compare(shooter.getHealth(), 0.01f) == -1) {
+                return false;
             }
-
-            this.nm.notification(target, shooter);
+    
+            // Return false if target is alreday dead
+            if (target != null && Util.compare(target.getHealth(), 0.01f) == -1) {
+                return false;
+            }
+    
+            LaserBeam laser = new LaserBeam(x, y, x2, y2);
+    
+            this.arena.fire(laser);
+    
+            // Subtract health if robot was hit
+            if(this.mm.occupied(x2, y2)) {
+                // TODO Review the use of the new Robot variable
+                RobotInfo robot = this.mm.getRobot(x2, y2);
+                robot.setHealth(robot.getHealth() - 35.0f);
+    
+                this.logger.appendText(shooter.getName() + " hit " + target.getName() + "\n");
+    
+                if (Util.compare(robot.getHealth(), 0.01f) == -1) {
+                    this.killRobot(robot.getName());
+                }
+    
+                this.nm.notification(target, shooter);
+            }
+    
+            return true;
         }
-
-        return true;
 	}
 
     /**
@@ -165,7 +178,7 @@ public class Game {
      */
     public void start() {
         synchronized(monitor) {
-            // TODO Move logger start to here
+            logger.appendText("Game started\n");
             // Extract the keyvalue pairs from the list and itterate through them
             for (Map.Entry<String,RobotAI> set : this.ais.entrySet()) {
                 // Get the specific RC object for this ai and call unAI
@@ -179,6 +192,7 @@ public class Game {
      */
     public void stop() {
         synchronized(monitor) {
+            logger.appendText("Game stopped\n");
             for (RobotAI ai : this.ais.values()) {
                 try {
                     ai.stop();

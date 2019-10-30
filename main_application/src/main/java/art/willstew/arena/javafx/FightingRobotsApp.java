@@ -1,7 +1,10 @@
 package art.willstew.arena.javafx;
 
+import java.security.InvalidParameterException;
+
 import art.willstew.ai.*;
 import art.willstew.logic.*;
+import art.willstew.robots.RobotInfo;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -14,7 +17,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-public class ExampleJFXApp extends Application {
+public class FightingRobotsApp extends Application {
+    private boolean started = false;
+
     public static void main(String[] args) {
         launch();
     }
@@ -23,28 +28,28 @@ public class ExampleJFXApp extends Application {
     public void start(Stage stage) {
         stage.setTitle("Fighting Robots");
 
-        int gridWidth = 12;
-        int gridHeight = 8;
+        final int gridWidth = 10;
+        final int gridHeight = 10;
 
         TextArea logger = new TextArea();
-        JFXArena arena = new JFXArena();
+        JFXArena arena = new JFXArena(gridWidth, gridHeight);
         MovementManager mm = new MovementManager(gridWidth, gridHeight);
         NotificationManager nm = new NotificationManager();
 
-        Game game = new Game(arena, logger, mm, nm);
-        arena.registerGame(game);
+        Game game = new Game(arena, logger, mm, nm, gridWidth, gridHeight);
+        arena.registerGame(game); // Add a reference to game
 
         try {
-            RobotInfoImp robotOne = new RobotInfoImp("Izzy", 2, 2, 100.0f);
+            RobotInfo robotOne = new RobotInfoImp("Izzy", 2, 2, 100.0f);
             game.addRobot(robotOne, new AIOne());
 
-            RobotInfoImp robotTwo = new RobotInfoImp("Archie", 11, 0, 100.0f);
+            RobotInfo robotTwo = new RobotInfoImp("Archie", 9, 0, 100.0f);
             game.addRobot(robotTwo, new AIOne());
 
-            RobotInfoImp robotThree = new RobotInfoImp("Remus", 2, 4, 100.0f);
+            RobotInfo robotThree = new RobotInfoImp("Remus", 2, 8, 100.0f);
             game.addRobot(robotThree, new AITwo());
 
-            RobotInfoImp robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
+            RobotInfo robotFour = new RobotInfoImp("Bogart", 5, 2, 100.0f);
             game.addRobot(robotFour, new AITwo());
 
             // RobotInfoImp robotFive = new RobotInfoImp("Juno", 11, 7, 100.0f);
@@ -54,6 +59,8 @@ public class ExampleJFXApp extends Application {
             // game.addRobot(robotSix, new NativeAI());  
         } catch (IllegalStateException e) {
             // Ignore, try and run the program with however many robots are there
+        } catch (InvalidParameterException e) {
+            // Ignore, try and run the program with however many robots are there
         }
 
         ToolBar toolbar = new ToolBar();
@@ -62,17 +69,31 @@ public class ExampleJFXApp extends Application {
         toolbar.getItems().addAll(btn1, btn2);
         
         btn1.setOnAction((event) -> {
-            System.out.println("Game started");
-            logger.appendText("Game started\n");
-            // arena.start();
-            game.start();
+            if (this.started) {
+                return;
+            } else {
+                this.started = true;
+            }
+
+            try {
+                game.start();
+            } catch (IllegalStateException e) {
+                // Ignore, game is already running
+            }
+            
         });
 
         btn2.setOnAction((event) -> {
-            System.out.println("Stopping game\n");
-            logger.appendText("Stopping game\n");
-            // arena.stop();
-            game.stop();
+            if (!this.started) {
+                return;
+            }
+
+            try {
+                game.stop();
+            } catch (IllegalStateException e) {
+                // Game is not running, ignore
+            }
+
         });
         
         SplitPane splitPane = new SplitPane();
@@ -93,7 +114,6 @@ public class ExampleJFXApp extends Application {
                 Platform.exit();
 
                 try {
-                    // arena.stop();
                     game.stop();
                 } catch(IllegalStateException e) {
                     // Safe to ignore

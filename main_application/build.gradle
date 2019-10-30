@@ -20,7 +20,7 @@ javafx {
 }
 
 application {
-    mainClassName = "art.willstew.arena.javafx.ExampleJFXApp"
+    mainClassName = "art.willstew.arena.javafx.FightingRobotsApp"
 }
 
 // systemProperty "java.library.path", "/Users/stewwf/Projects/Fighting-Robots/native_ai/build/libs/nativeimp/shared"
@@ -31,6 +31,6 @@ applicationDefaultJvmArgs = ["-Djdk.gtk.verbose=true", "-Djdk.gtk.version=2"]
 
 jar {
     manifest {
-        attributes 'Main-Class': "art.willstew.arena.javafx.ExampleJFXApp"
+        attributes 'Main-Class': "art.willstew.arena.javafx.FightingRobotsApp"
     }
 }
