@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+/** 
+ * Native implementation of a RobotAI.
+ * This code is run by the NativeAI java wrapper.
+ * It uses JNI to communicate with the java code.
+ * The AI will instruct the robot to act like AIOne, shot if it can, then move.
+ * @param rc RobotControl, the api for the game
+*/
 JNIEXPORT void JNICALL Java_art_willstew_ai_NativeAI_logic(JNIEnv *env, jobject this, jobject rc) {
 
     // Get a reference to RobotControl class
@@ -35,10 +42,8 @@ JNIEXPORT void JNICALL Java_art_willstew_ai_NativeAI_logic(JNIEnv *env, jobject 
     jmethodID getY = (*env)->GetMethodID(env, riCls, "getY", "()I");
     // Get a reference to RobotInfo.getName()
     jmethodID getName = (*env)->GetMethodID(env, riCls, "getName", "()Ljava/lang/String;");
-
-    // Call RobotInfo.getHealth()
-    //float health = (float)(*env)->CallFloatMethod(env, me, getHealth);
     
+    // Set a default direction
     int direction = 0;
 
     while(1 == 1) {
@@ -75,7 +80,7 @@ JNIEXPORT void JNICALL Java_art_willstew_ai_NativeAI_logic(JNIEnv *env, jobject 
             }
         }
 
-        
+        // If the robot can move in this direction, move, else attempt another direction
         switch (direction) {
             case 0:
                 if ((int)(*env)->CallObjectMethod(env, rc, moveNorth) == 1) {

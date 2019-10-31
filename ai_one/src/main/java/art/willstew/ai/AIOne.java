@@ -110,12 +110,6 @@ public class AIOne implements RobotAI  {
         }
     }
 
-    public void stopCheck() {
-        if (this.thread.isInterrupted()) {
-
-        }
-    }
-
     public void stop() {
         // Throw an exception if the thread isn't running
         if(this.thread == null) {
