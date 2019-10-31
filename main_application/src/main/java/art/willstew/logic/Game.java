@@ -9,7 +9,6 @@ import java.util.Map;
 
 import art.willstew.arena.javafx.JFXArena;
 import art.willstew.robots.RobotInfo;
-import javafx.scene.control.TextArea;
 import art.willstew.robots.*;
 
 /**

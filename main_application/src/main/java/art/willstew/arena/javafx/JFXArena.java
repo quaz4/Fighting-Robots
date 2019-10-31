@@ -36,9 +36,9 @@ public class JFXArena extends Pane {
     private ScheduledExecutorService executor;
 
     /**
+     * Creates a new arena object, loading the robot image and initialising a drawing surface.
      * @param gridWidth The width of the arena grid
      * @param gridHeight The height of the arena grid
-     * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
     public JFXArena(int gridWidth, int gridHeight) {
         this.gridWidth = gridWidth;
@@ -57,16 +57,29 @@ public class JFXArena extends Pane {
         this.requestLayout();
     }
 
+    /**
+     * This method is needed to start the executor service for removing the lasers from the screen
+     * It can't be in the constructor as the game object needs to be initialised first, to set the size
+     * The number of threads in the pool is the number of robots in the game, as that is the maximum number
+     * of shots that could be fired at any time
+     */
     public void start() {
         this.executor = Executors.newScheduledThreadPool(this.game.getAllRobots().length);
     }
 
+    /**
+     * Wrapper to request an update to the GUI
+     */
     public void update() {
         Platform.runLater(() -> {
             this.requestLayout();
         });
     }
 
+    /**
+     * Allows us to link the arena and the game, its needed to resolve a circular dep
+     * @param game Used to get information about the game state
+     */
     public void registerGame(Game game) {
         this.game = game;
     }
@@ -122,8 +135,10 @@ public class JFXArena extends Pane {
      *
      * Note that the grid location can be fractional, so that (for instance), you can draw an image 
      * at location (3.5,4), and it will appear on the boundary between grid cells (3,4) and (4,4).
-     *     
-     * You shouldn't need to modify this method.
+     * @param gfx Used to update the canvas
+     * @param image The image to be rendered
+     * @param gridX X coordinate location for image
+     * @param gridY Y coordinate location for image
      */
     private void drawImage(GraphicsContext gfx, Image image, double gridX, double gridY) {
         // Get the pixel coordinates representing the centre of where the image is to be drawn. 
@@ -158,12 +173,13 @@ public class JFXArena extends Pane {
             displayedPixelHeight);
     }
     
-    
     /**
      * Displays a string of text underneath a specific grid location. *Only* call this from within 
-     * layoutChildren(). 
-     *
-     * You shouldn't need to modify this method.
+     * layoutChildren().
+     * @param gfx Used to update the canvas
+     * @param label The text to be rendered under the grid location
+     * @param gridX X coordinate location for label
+     * @param gridY Y coordinate location for label
      */
     private void drawLabel(GraphicsContext gfx, String label, double gridX, double gridY) {
         gfx.setTextAlign(TextAlignment.CENTER);
@@ -174,13 +190,16 @@ public class JFXArena extends Pane {
     
     /** 
      * Draws a (slightly clipped) line between two grid coordinates. 
-     *
-     * You shouldn't need to modify this method.
+     * @param gfx Used to update the canvas
+     * @param gridX1 X coordinate location for line start
+     * @param gridY1 Y coordinate location for line start
+     * @param gridX2 X coordinate location for line end
+     * @param gridY2 Y coordinate location for line end
      */
     private void drawLine(GraphicsContext gfx, double gridX1, double gridY1, 
                                                double gridX2, double gridY2) {
         gfx.setStroke(Color.RED);
-        
+
         // Recalculate the starting coordinate to be one unit closer to the destination, so that it
         // doesn't overlap with any image appearing in the starting grid cell.
         final double radius = 0.5;
@@ -197,6 +216,7 @@ public class JFXArena extends Pane {
     /**
      * Fires a shot from x,y to x2,y2
      * Performs logic on the GUI thread to avoid race conditions
+     * @param laser LaserBeam object that specifies the start and end point for a laser
      */
 	public void fire(LaserBeam laser) {
         this.lasers.add(laser);
@@ -214,6 +234,10 @@ public class JFXArena extends Pane {
         executor.schedule(removeLaser, 250, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Cleanup the executor
+     * Needs to be called otherwise threads will be left running
+     */
     public void stop() {
         this.executor.shutdown();
     }
