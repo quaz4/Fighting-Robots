@@ -11,7 +11,6 @@ import art.willstew.robots.RobotInfo;
  * Each robot is keyed to its x value and y value, seperated by :
  * e.g. x = 10 and y = 2 would have a key of 10:2
  */
-
 public class MovementManager {
 
     private Object monitor = new Object();
@@ -20,6 +19,11 @@ public class MovementManager {
     private int y;
     private Hashtable<String, RobotInfo> grid;
 
+    /**
+     * Init the hash table and grid size
+     * @param x Max grid x size
+     * @param y Max grid y size
+     */
     public MovementManager(int x, int y) {
         this.x = x;
         this.y = y;
@@ -38,6 +42,10 @@ public class MovementManager {
     /**
      * Move the robot provided, deltaX and deltaY can be positive or negative
      * and specify how far to move in each direction
+     * @param robot The robot to move
+     * @param deltaX The relative distance to move in the x direction
+     * @param deltaY The relative distance to move in the y direction
+     * @return Retuns if the move was valid
      */
     public boolean move(RobotInfo robot, int deltaX, int deltaY) {
         // Calculate the new positions
@@ -69,6 +77,12 @@ public class MovementManager {
         return true;
     }
 
+    /**
+     * Tests if the location in the grid is occupied
+     * @param x X coordinate to test
+     * @param y Y coordinate to test
+     * @return Returns if the location is occupied
+     */
     public boolean occupied(int x, int y) {
         synchronized(monitor) {
             String hash = x + ":" + y;
@@ -80,6 +94,12 @@ public class MovementManager {
         }
     }
 
+    /**
+     * Gets the robot that is at the specified location, or returns null
+     * @param x X coordinate of the robot
+     * @param y Y coordinate of the robot
+     * @return Returns the robot or null
+     */
     public RobotInfo getRobot(int x, int y) {
         synchronized(monitor) {
             String hash = x + ":" + y;
