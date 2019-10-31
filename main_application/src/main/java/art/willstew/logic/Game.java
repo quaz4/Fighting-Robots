@@ -48,6 +48,8 @@ public class Game {
     /**
      * Construct robot object and register with required lists
      * Prevent duplicate names from being added
+     * @param robot Reference to the robot info object, should be unique
+     * @param ai The AI that will be controlling this robot, should be unique
      */
     public void addRobot(RobotInfo robot, RobotAI ai) {
         synchronized(monitor) {
@@ -69,16 +71,20 @@ public class Game {
         }
     }
 
+    /**
+     * Stops the named robots ai and logs that the robot is dead
+     * @param name unique name of a robot
+     */
     public void killRobot(String name) {
         synchronized(monitor) {
-            // Remove robot from robotInfo list
+            // Get robot ai and stop it
             for (RobotInfo robot : this.ri.toArray(new RobotInfo[this.ri.size()])) {
                 if (robot.getName().equals(name)) {
                     this.ais.get(robot.getName()).stop();
                     this.logger.log(robot.getName() + " is now dead\n");
                     
                     this.checkEndGame();
-                    break;
+                    break; // No point continuing to search
                 }
             }
         }
@@ -88,19 +94,22 @@ public class Game {
      * Checks to see if the game has ended by counting the number of
      * robots left alive.
      * 
-     * Usually called after a robot has been killed
+     * Usually called after a robot has been killed.
      */
     private void checkEndGame() {
         synchronized(monitor) {
             int alive = 0;
             RobotInfo lastRobot = null;
+            // Loop through all robots in the game
             for (RobotInfo robot : this.ri.toArray(new RobotInfo[this.ri.size()])) {
+                // Check if it is alive
                 if(Util.compare(robot.getHealth(), 0.01f) == 1) {
                     alive++;
                     lastRobot = robot;
                 }
             }
     
+            // If only one robot is left alive, stop it and log that it won
             if(alive == 1) {
                this.stop();
                this.logger.log(lastRobot.getName() + " is the winner\n"); 
@@ -108,6 +117,14 @@ public class Game {
         }
     }
 
+    /**
+     * Fires a shot from x,y to x2,y2
+     * @param x x coordinate for shot start
+     * @param y y coordinate for shot start
+     * @param x2 x coordinate for shot end
+     * @param y2 y coordinate for shot end
+     * @return if the shot was valid, not if it has hit, a miss is still a valid shot
+     */
     public boolean fire(int x, int y, int x2, int y2) {
         synchronized(monitor) {
             RobotInfo shooter = this.mm.getRobot(x, y);
@@ -128,18 +145,16 @@ public class Game {
             this.arena.fire(laser);
     
             // Subtract health if robot was hit
-            if(this.mm.occupied(x2, y2)) {
-                // TODO Review the use of the new Robot variable
-                RobotInfo robot = this.mm.getRobot(x2, y2);
-                robot.setHealth(robot.getHealth() - 35.0f);
+            if(target != null) {
+                target.setHealth(target.getHealth() - 35.0f);
     
                 this.logger.log(shooter.getName() + " hit " + target.getName() + "\n");
     
-                if (Util.compare(robot.getHealth(), 0.01f) == -1) {
-                    this.killRobot(robot.getName());
+                if (Util.compare(target.getHealth(), 0.01f) == -1) {
+                    this.killRobot(target.getName());
                 }
     
-                this.nm.notification(target, shooter);
+                this.nm.notification(target, shooter); // Notify target and shooter of the result
             }
     
             return true;
@@ -149,6 +164,10 @@ public class Game {
     /**
      * Runs calls to check and move the specific robot in the GUI thread
      * Uses a completable future to block until the GUI thread runs the code
+     * @param robot The robot to move
+     * @param deltaX The relative change in the x value
+     * @param deltaY The relative change in the y value
+     * @return If the move is valid
      */
     public boolean move(RobotInfo robot, int deltaX, int deltaY) {
         synchronized(monitor) {
@@ -162,6 +181,10 @@ public class Game {
         }
     }
 
+    /**
+     * Gets a reference to all robots
+     * @return Array of RobotInfo objects
+     */
     public RobotInfo[] getAllRobots() {
         synchronized(monitor) {
             return this.ri.toArray(new RobotInfo[this.ri.size()]);
