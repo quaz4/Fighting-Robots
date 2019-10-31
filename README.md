@@ -1,5 +1,7 @@
 # Fighting-Robots
-Written by William Stewart
+A multithreaded robot fighting game written in Java and C.
+
+Written by William Stewart (18349788) for Software Engineering Concepts (COMP3003)
 
 ## Building/Running
 ### Requirements
@@ -9,7 +11,13 @@ You can check if this is set by running `echo $JAVA_HOME`.
 
 In order for the native c code to be found, it must be added to the LD_LIBRARY_PATH.
 The `/Fighting-Robots/native_ai/build/libs/nativeimp/shared` directory needs to be added to this environment variable.
-e.g. `export LD_LIBRARY_PATH=/your/path/to/Fighting-Robots/native_ai/build/libs/nativeimp/shared`
+e.g. `export LD_LIBRARY_PATH=/your/path/to/Fighting-Robots/native_ai/build/libs/nativeimp/shared`.
+
+### Running
+Assuming all requirements are met, simply running `./gradlew run` should build and run the application, no other steps required.
+
+### Distribution
+After running `./gradlew build` a distributable will be available in `/Fighting-Robots/main_application/build/distributions/`.
 
 ## Game Config
 ### Robots
