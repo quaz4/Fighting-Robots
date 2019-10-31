@@ -11,8 +11,8 @@ public class NativeAI implements RobotAI  {
     static {
         try {
             System.loadLibrary("nativeimp");
-        } catch (Error e) {
-            System.out.println(e);
+        } catch (UnsatisfiedLinkError e) {
+            System.err.println("Could not load native library in NativeAI");
         }
     }
 

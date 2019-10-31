@@ -20,26 +20,24 @@ import javafx.scene.text.TextAlignment;
 
 /**
  * A JavaFX GUI element that displays a grid on which you can draw images, text and lines.
- * It also
+ * This class contains no game logic, it is just used for representing the game state
  */
 public class JFXArena extends Pane {
     // Represents the image to draw. You can modify this to introduce multiple images.
     private static final String IMAGE_FILE = "1554047213.png";
     private Image robotImage;
-    
-    // The following values are arbitrary, and you may need to modify them according to the 
-    // requirements of your application.
     private int gridWidth;
     private int gridHeight;
     private double gridSquareSize; // Auto-calculated
     private Canvas canvas; // Used to provide a 'drawing surface'.
-
     private List<LaserBeam> lasers; // List to keep track of the lasers to draw
     private Game game;
 
     private ScheduledExecutorService executor;
 
     /**
+     * @param gridWidth The width of the arena grid
+     * @param gridHeight The height of the arena grid
      * Creates a new arena object, loading the robot image and initialising a drawing surface.
      */
     public JFXArena(int gridWidth, int gridHeight) {
@@ -49,9 +47,6 @@ public class JFXArena extends Pane {
         // Here's how you get an Image object from an image file (which you provide in the 
         // 'resources/' directory.
         robotImage = new Image(getClass().getClassLoader().getResourceAsStream(IMAGE_FILE));
-        
-        // You will get an exception here if the specified image file cannot be found.
-        
         canvas = new Canvas();
         canvas.widthProperty().bind(widthProperty());
         canvas.heightProperty().bind(heightProperty());
@@ -59,11 +54,11 @@ public class JFXArena extends Pane {
 
         this.lasers = Collections.synchronizedList(new ArrayList<LaserBeam>());
 
-        // this.executor = Executors.newScheduledThreadPool(this.robotInfo.size());
-        // System.out.println(this.game.getAllRobots().length);
-        this.executor = Executors.newScheduledThreadPool(8);
-
         this.requestLayout();
+    }
+
+    public void start() {
+        this.executor = Executors.newScheduledThreadPool(this.game.getAllRobots().length);
     }
 
     public void update() {

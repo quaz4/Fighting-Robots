@@ -13,33 +13,33 @@ import javafx.scene.control.TextArea;
 import art.willstew.robots.*;
 
 /**
- * The Game class handles all of the game logic
+ * The Game class coordinates the running of the game logic
+ * This includes, movement, shooting and starting/ending the game
  */
 public class Game {
 
-    // TODO check that this datatype is a pure object
     private Object monitor = new Object();
 
     private JFXArena arena;
-    private TextArea logger;
+    private Logger logger;
     private MovementManager mm;
     private NotificationManager nm;
 
-    private Hashtable<String, RobotAI> ais;
-    private List<RobotInfo> ri;
-    private Hashtable<String, RobotControl> rc;
+    private Hashtable<String, RobotAI> ais; // Access to ais by name
+    private List<RobotInfo> ri; // List of all robots
+    private Hashtable<String, RobotControl> rc; // Access to RobotContols by name
 
     private int gridWidth;
     private int gridHeight;
 
-    public Game(JFXArena arena, TextArea logger, MovementManager mm, NotificationManager nm, int x, int y) {
+    public Game(JFXArena arena, Logger logger, MovementManager mm, NotificationManager nm, int x, int y) {
         this.arena = arena; // GUI Grid
         this.logger = logger; // Text output about game actions
         this.mm = mm; // MovementManager
         this.nm = nm; // NotificationManger
 
         this.ais = new Hashtable<String, RobotAI>();
-        this.ri = Collections.synchronizedList(new ArrayList<RobotInfo>()); // TODO Make thread safe // RobotInfo
+        this.ri = Collections.synchronizedList(new ArrayList<RobotInfo>());
         this.rc = new Hashtable<String, RobotControl>(); // RobotControl
 
         this.gridWidth = x;
@@ -70,17 +70,13 @@ public class Game {
         }
     }
 
-    // public RobotInfo getRobotAt(int x, int y) {
-    //     return this.mm.getRobot(x, y);
-    // }
-
     public void killRobot(String name) {
         synchronized(monitor) {
             // Remove robot from robotInfo list
             for (RobotInfo robot : this.ri.toArray(new RobotInfo[this.ri.size()])) {
                 if (robot.getName().equals(name)) {
                     this.ais.get(robot.getName()).stop();
-                    this.logger.appendText(robot.getName() + " is now dead\n");
+                    this.logger.log(robot.getName() + " is now dead\n");
                     
                     this.checkEndGame();
                     break;
@@ -108,7 +104,7 @@ public class Game {
     
             if(alive == 1) {
                this.stop();
-               this.logger.appendText(lastRobot.getName() + " is the winner\n"); 
+               this.logger.log(lastRobot.getName() + " is the winner\n"); 
             }
         }
     }
@@ -138,7 +134,7 @@ public class Game {
                 RobotInfo robot = this.mm.getRobot(x2, y2);
                 robot.setHealth(robot.getHealth() - 35.0f);
     
-                this.logger.appendText(shooter.getName() + " hit " + target.getName() + "\n");
+                this.logger.log(shooter.getName() + " hit " + target.getName() + "\n");
     
                 if (Util.compare(robot.getHealth(), 0.01f) == -1) {
                     this.killRobot(robot.getName());
@@ -178,7 +174,7 @@ public class Game {
      */
     public void start() {
         synchronized(monitor) {
-            logger.appendText("Game started\n");
+            logger.log("Game started\n");
             // Extract the keyvalue pairs from the list and itterate through them
             for (Map.Entry<String,RobotAI> set : this.ais.entrySet()) {
                 // Get the specific RC object for this ai and call unAI
@@ -192,7 +188,7 @@ public class Game {
      */
     public void stop() {
         synchronized(monitor) {
-            logger.appendText("Game stopped\n");
+            logger.log("Game stopped\n");
             for (RobotAI ai : this.ais.values()) {
                 try {
                     ai.stop();
