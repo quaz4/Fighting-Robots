@@ -2,6 +2,9 @@ package art.willstew.logic;
 
 import art.willstew.robots.RobotInfo;
 
+/**
+ * Implements RobotInfo interface, used to define all of the info about a robot
+ */
 public class RobotInfoImp implements RobotInfo {
 
     /**
@@ -92,25 +95,17 @@ public class RobotInfoImp implements RobotInfo {
         }
     }
 
+    // Prevents health from falling below 0
     public void setHealth(float health) {
         // Compare will return 0 if health is less than 0.0f
         if (Float.compare(health, 0.0f) <= 0) {
-            // throw new IllegalArgumentException("Health must be an int greater than or equal to 0");
             health = 0.0f;
         }
 
         synchronized(this.monitor) {
             this.health = health;
         }
-
-        // System.out.println(this.name + "'s health is now " + this.health);
     }
-
-    // public void takeHit() {
-    //     synchronized(this.monitor) {
-    //         this.health -= 35.0f;
-    //     }
-    // }
 
     public float getHealth() {
         synchronized(this.monitor) {

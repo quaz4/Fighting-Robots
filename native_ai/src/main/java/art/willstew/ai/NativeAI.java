@@ -8,11 +8,12 @@ public class NativeAI implements RobotAI  {
     private Thread thread = null;
     private RobotControl rc;
 
+    // Load the nativelibrary before using the class
     static {
         try {
             System.loadLibrary("nativeimp");
-        } catch (Error e) {
-            System.out.println(e);
+        } catch (UnsatisfiedLinkError e) {
+            System.err.println("Could not load native library in NativeAI");
         }
     }
 

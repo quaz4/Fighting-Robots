@@ -1,20 +1,34 @@
 package art.willstew.logic;
 
-import art.willstew.arena.javafx.JFXArena;
 import art.willstew.robots.RobotControl;
 import art.willstew.robots.RobotInfo;
 
+/**
+ * An implementation of the RobotControl api
+ * AIs can be passed an instance of this object to pass on commands to the game
+ */
 public class RobotControlImp implements RobotControl {
 
-    private JFXArena arena; 
+    private Game game; // Reference to the game object to pass on calls
     private RobotInfo robot; // A reference to the robot this controller controls
     private NotificationManager nm;
 
-    public RobotControlImp(JFXArena arena, RobotInfo robot, NotificationManager nm) {
-        this.arena = arena;
+    // Constants defining how long each robot should sleep
+    private final int MOVE_SLEEP = 1000;
+    private final int FIRE_SLEEP = 500;
+
+    /**
+     * Implements th
+     * @param game Reference to the game object that this api allows access to
+     * @param robot Reference to the robot that this controller is assigned to
+     * @param nm Notification manager to allow notifcations to be sent
+     */
+    public RobotControlImp(Game game, RobotInfo robot, NotificationManager nm) {
+        this.game = game;
         this.robot = robot;
         this.nm = nm;
 
+        // Register for notications
         this.nm.registerShooter(robot.getName());
         this.nm.registerTarget(robot.getName());
     }
@@ -26,37 +40,37 @@ public class RobotControlImp implements RobotControl {
 
     @Override
     public RobotInfo[] getAllRobots() {
-        return this.arena.getAllRobots();
+        return this.game.getAllRobots();
     }
 
     @Override
     public boolean moveNorth() throws InterruptedException {
-        Thread.sleep(1000);
-        return this.arena.move((RobotInfoImp)this.getRobot(), 0, -1);
+        Thread.sleep(MOVE_SLEEP);
+        return this.game.move((RobotInfoImp)this.getRobot(), 0, -1);
     }
 
     @Override
     public boolean moveEast() throws InterruptedException {
-        Thread.sleep(1000);
-        return this.arena.move((RobotInfoImp)this.getRobot(), 1, 0);
+        Thread.sleep(MOVE_SLEEP);
+        return this.game.move((RobotInfoImp)this.getRobot(), 1, 0);
     }
 
     @Override
     public boolean moveSouth() throws InterruptedException {
-        Thread.sleep(1000);
-        return this.arena.move((RobotInfoImp)this.getRobot(), 0, 1);
+        Thread.sleep(MOVE_SLEEP);
+        return this.game.move((RobotInfoImp)this.getRobot(), 0, 1);
     }
 
     @Override
     public boolean moveWest() throws InterruptedException {
-        Thread.sleep(1000);
-        return this.arena.move((RobotInfoImp)this.getRobot(), -1, 0);
+        Thread.sleep(MOVE_SLEEP);
+        return this.game.move((RobotInfoImp)this.getRobot(), -1, 0);
     }
 
     @Override
     public boolean fire(int x, int y) throws InterruptedException {
-        Thread.sleep(500);
-        return this.arena.fire(this.robot.getX(), this.robot.getY(), x, y);
+        Thread.sleep(FIRE_SLEEP);
+        return this.game.fire(this.robot.getX(), this.robot.getY(), x, y);
     }
 
     @Override

@@ -7,9 +7,9 @@ import art.willstew.robots.RobotControl;
 import art.willstew.robots.RobotInfo;
 
 /**
- * An implementation of RobotAI
- * This AI will move towards a randomly selected target
- * It will move towards the last robot to shoot it
+ * An implementation of RobotAI.
+ * This AI will move towards a randomly selected target.
+ * It will also move towards the last robot to shoot it.
  */
 public class AITwo implements RobotAI  {
 
@@ -48,7 +48,6 @@ public class AITwo implements RobotAI  {
         try {
             String direction = "north";
             me = this.rc.getRobot();
-
 
             target = this.randomTarget();
 
